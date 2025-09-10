@@ -1,86 +1,44 @@
 export const testimonials = [
   {
-    name: 'dcodesdev',
-    title: 'TypeScript Developer',
-    avatarFallback: 'DC',
+    name: 'María G.',
+    title: 'Amazon Flex Driver',
+    avatarFallback: 'MG',
     avatarImg: '/images/dcodes.png',
-    text: "That's beautiful bro!"
+    text: "AutoFlex Easy saves me 3 hours every day. Now I grab premium blocks effortlessly while having breakfast."
   },
   {
-    name: 'SuhailKakar',
-    title: 'Developer at joinOnboard',
-    avatarFallback: 'SK',
+    name: 'Carlos R.',
+    title: 'Full-Time Driver',
+    avatarFallback: 'CR',
     avatarImg: '/images/SuhailKakar.jpg',
-    text: "If you've built this a few months ago, it would have saved me hours :D"
+    text: "Since using AutoFlex, my weekly earnings increased by 40%. The investment paid off in 2 days."
   },
   {
-    name: 'SaidAitmbarek',
-    title: 'Founder of microlaunch.net',
-    avatarFallback: 'SA',
+    name: 'Elena V.',
+    title: 'New Amazon Flex Driver',
+    avatarFallback: 'EV',
     avatarImg: '/images/said.jpg',
-    text: "So cool, looks really clean. Any plan to open source it? ☺️ Wanna play with it!"
+    text: "As a beginner, this tool was a lifesaver. Setup in 5 minutes and 24/7 support."
   },
   {
-    name: 'magicuidesign',
-    title: 'UI Design Company',
-    avatarFallback: 'MU',
+    name: 'Javier M.',
+    title: 'Driver since 2020',
+    avatarFallback: 'JM',
     avatarImg: '/images/magicui.jpg',
-    text: "Clean 🤌"
+    text: "I tried all the tools on the market and this one is the fastest and most reliable. Unbeatable!"
   },
   {
-    name: 'YasmeenRoumie',
-    title: 'Developer',
-    avatarFallback: 'YR',
+    name: 'Laura T.',
+    title: 'Mother & Driver',
+    avatarFallback: 'LT',
     avatarImg: '/images/yasmeen.jpg',
-    text: "Ooh would love to try this out"
+    text: "Now I can choose blocks near my kids’ school. Real flexibility!"
   },
   {
-    name: 'shadcn',
-    title: 'Developer',
-    avatarFallback: 'SC',
-    avatarImg: '/images/shadcn.jpg',
-    text: "👀"
-  },
-  {
-    name: 'bzagrodzki',
-    title: 'Developer',
-    avatarFallback: 'BZ',
+    name: 'Roberto S.',
+    title: 'Experienced Driver',
+    avatarFallback: 'RS',
     avatarImg: '/images/bzrag.jpg',
-    text: "Nice one! But I would prefer some more \"sans\" font 😉"
-  },
-  {
-    name: 'MPlegas',
-    title: 'Developer',
-    avatarFallback: 'MP',
-    avatarImg: '/images/MPlegas.jpg',
-    text: "Exceptional!"
-  },
-  {
-    name: 'kvncyf_',
-    title: 'Developer',
-    avatarFallback: 'KC',
-    avatarImg: '/images/kvn.jpg',
-    text: "Nice move."
-  },
-  {
-    name: '0xRaduan',
-    title: 'Developer',
-    avatarFallback: 'RA',
-    avatarImg: '/images/0xraduan.jpg',
-    text: "This looks fire"
-  },
-  {
-    name: 'Luax0',
-    title: 'Developer',
-    avatarFallback: 'LX',
-    avatarImg: '/images/luax0.jpg',
-    text: "Can't wait to see more 👀"
-  },
-  {
-    name: 'ausrobdev',
-    title: 'Developer',
-    avatarFallback: 'RA',
-    avatarImg: '/images/robdev.jpg',
-    text: "Let me know when its ready, I'll add it to buildatlightspeed.com - we need more high quality open source boilerplates"
+    text: "AutoFlex Easy helps me organize my week efficiently and make the most out of every block."
   }
 ];
