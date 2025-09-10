@@ -35,10 +35,52 @@ export const testimonials = [
     text: "Now I can choose blocks near my kids’ school. Real flexibility!"
   },
   {
+    name: 'David T.',
+    title: 'Logistics Enthusiast',
+    avatarFallback: 'DT',
+    avatarImg: '/images/shadcn.jpg',
+    text: "AutoFlex Easy lets me plan my week efficiently and never miss high-value blocks."
+  },
+  {
+    name: 'Sofia G.',
+    title: 'Amazon Flex Driver',
+    avatarFallback: 'SG',
+    avatarImg: '/images/bzrag.jpg',
+    text: "I no longer worry about missing blocks. AutoFlex Easy handles it all for me."
+  },
+  {
+    name: 'Miguel R.',
+    title: 'Part-Time Driver',
+    avatarFallback: 'MR',
+    avatarImg: '/images/MPlegas.jpg',
+    text: "Block automation is real. This tool is a must for every Flex driver."
+  },
+  {
+    name: 'Ana S.',
+    title: 'Amazon Flex Driver',
+    avatarFallback: 'AS',
+    avatarImg: '/images/kvn.jpg',
+    text: "Easy to set up and very effective. I recommend it to everyone."
+  },
+  {
     name: 'Roberto S.',
     title: 'Experienced Driver',
     avatarFallback: 'RS',
-    avatarImg: '/images/bzrag.jpg',
-    text: "AutoFlex Easy helps me organize my week efficiently and make the most out of every block."
+    avatarImg: '/images/0xraduan.jpg',
+    text: "AutoFlex Easy helps me stay organized and make the most of every block."
+  },
+  {
+    name: 'Jessica L.',
+    title: 'Full-Time Driver',
+    avatarFallback: 'JL',
+    avatarImg: '/images/luax0.jpg',
+    text: "My earnings have gone up 30% since I started using AutoFlex Easy. Incredible!"
+  },
+  {
+    name: 'Carlos M.',
+    title: 'Amazon Flex Driver',
+    avatarFallback: 'CM',
+    avatarImg: '/images/robdev.jpg',
+    text: "AutoFlex Easy changed how I work. Capturing blocks is now effortless while I handle other tasks."
   }
 ];
