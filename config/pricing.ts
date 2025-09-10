@@ -8,50 +8,31 @@ interface Plan {
 
 const pricingPlans: Plan[] = [
   {
-    name: 'Starter',
-    description: 'Kickstart your journey with essential templates and community access.',
+    name: 'Plan Semanal',
+    description: 'Acceso completo por 7 días. Ideal para probar el servicio.',
     features: [
-      'Access to basic template library',
-      'Monthly community newsletter',
-      "Entry to our 'Template Exchange' forum",
-      'Random template suggestions',
-      'Template of the month'
+      'Captura automática de bloques 24/7',
+      'Alertas instantáneas en tu móvil',
+      'Soporte prioritario por WhatsApp',
+      'Actualizaciones gratuitas',
+      'Garantía de satisfacción de 7 días'
     ],
-    monthlyPrice: 900,
-    yearlyPrice: 9000
+    monthlyPrice: 2500, // $25.00 en centavos
+    yearlyPrice: 0 // No aplica para plan semanal
   },
   {
-    name: 'Pro',
-    description: 'For those who need advanced templates and enhanced community engagement.',
+    name: 'Plan Mensual',
+    description: 'Acceso completo por 30 días. El favorito de los conductores.',
     features: [
-      'Access to premium template library',
-      'Weekly community digest',
-      "Priority access to 'Template Exchange' forum",
-      'Personalized template recommendations',
-      'Monthly expert webinar',
-      "Access to exclusive templates with 20% more features!",
-      'Custom template requests'
+      'Todo lo del plan semanal',
+      'Estadísticas de rendimiento avanzadas',
+      'Acceso a bloques exclusivos',
+      'Soporte prioritario 24/7',
+      'Configuraciones personalizadas',
+      'Ahorras $40 vs el plan semanal'
     ],
-    monthlyPrice: 9900,
-    yearlyPrice: 99000
-  },
-  {
-    name: 'Enterprise',
-    description: 'For organizations that require comprehensive templates and dedicated support.',
-    features: [
-      'Unlimited access to all templates',
-      'Daily template updates',
-      "VIP access to 'Template Exchange' forum",
-      'Personalized consulting sessions',
-      'Weekly live Q&A sessions',
-      "Access to the complete template library (unlimited!)",
-      'Templates on demand',
-      "Remove 'Powered by Template Generator'",
-      'Free membership to exclusive community events',
-      'Dedicated support h2otline'
-    ],
-    monthlyPrice: 99900,
-    yearlyPrice: 999000
+    monthlyPrice: 9000, // $90.00 en centavos
+    yearlyPrice: 0 // No aplica para plan mensual
   }
 ];
 
@@ -67,111 +48,49 @@ interface ProductWithPrices extends Product {
 
 export const dummyPricing: ProductWithPrices[] = [
   {
-    id: 'dummy-basic',
-    name: 'Basic Plan',
-    description: 'For individuals just getting started',
+    id: 'weekly-plan',
+    name: 'Plan Semanal',
+    description: 'Acceso completo por 7 días',
     prices: [
       {
-        id: 'dummy-basic-price-month',
+        id: 'weekly-price',
         currency: 'USD',
-        unit_amount: 999,
-        interval: 'month',
+        unit_amount: 2500, // $25.00
+        interval: 'week',
         interval_count: 1,
         trial_period_days: null,
         type: 'recurring',
         active: true,
-        product_id: 'dummy-basic',
-        description: null,
-        metadata: null
-      },
-      {
-        id: 'dummy-basic-price-year',
-        currency: 'USD',
-        unit_amount: 9990,
-        interval: 'year',
-        interval_count: 1,
-        trial_period_days: null,
-        type: 'recurring',
-        active: true,
-        product_id: 'dummy-basic',
+        product_id: 'weekly-plan',
         description: null,
         metadata: null
       }
     ],
     image: null,
     metadata: null,
-    active: null
+    active: true
   },
   {
-    id: 'dummy-pro',
-    name: 'Pro Plan',
-    description: 'For growing businesses',
+    id: 'monthly-plan',
+    name: 'Plan Mensual',
+    description: 'Acceso completo por 30 días',
     prices: [
       {
-        id: 'dummy-pro-price-month',
+        id: 'monthly-price',
         currency: 'USD',
-        unit_amount: 2999,
+        unit_amount: 9000, // $90.00
         interval: 'month',
         interval_count: 1,
         trial_period_days: null,
         type: 'recurring',
         active: true,
-        product_id: 'dummy-pro',
-        description: null,
-        metadata: null
-      },
-      {
-        id: 'dummy-pro-price-year',
-        currency: 'USD',
-        unit_amount: 29990,
-        interval: 'year',
-        interval_count: 1,
-        trial_period_days: null,
-        type: 'recurring',
-        active: true,
-        product_id: 'dummy-pro',
+        product_id: 'monthly-plan',
         description: null,
         metadata: null
       }
     ],
     image: null,
     metadata: null,
-    active: null
-  },
-  {
-    id: 'dummy-enterprise',
-    name: 'Enterprise Plan',
-    description: 'For large organizations',
-    prices: [
-      {
-        id: 'dummy-enterprise-price-month',
-        currency: 'USD',
-        unit_amount: 9999,
-        interval: 'month',
-        interval_count: 1,
-        trial_period_days: null,
-        type: 'recurring',
-        active: true,
-        product_id: 'dummy-enterprise',
-        description: null,
-        metadata: null
-      },
-      {
-        id: 'dummy-enterprise-price-year',
-        currency: 'USD',
-        unit_amount: 99990,
-        interval: 'year',
-        interval_count: 1,
-        trial_period_days: null,
-        type: 'recurring',
-        active: true,
-        product_id: 'dummy-enterprise',
-        description: null,
-        metadata: null
-      }
-    ],
-    image: null,
-    metadata: null,
-    active: null
+    active: true
   }
 ];
