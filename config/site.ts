@@ -8,6 +8,6 @@ export const siteConfig: SiteConfig = {
   ogImage: 'https://autoflexeasy.com/og.jpg', // la imagen para compartir en redes
   links: {
     twitter: 'https://twitter.com/AutoFlexEasy', // tu Twitter
-    github: 'https://github.com/tu-usuario/AutoFlexEasy' // tu repositorio si aplica
+   
   }
 };
