@@ -1,13 +1,13 @@
 import { SiteConfig } from 'types';
 
 export const siteConfig: SiteConfig = {
-  name: 'Hikari',
+  name: 'AutoFlex Easy',
   description:
-    'A complete & open-source Next.js 14 Subscription Starter template using Supabase, Stripe, Tailwind CSS.',
-  url: 'https://hikari.antoineross.com',
-  ogImage: 'https://hikari.antoineross.com/og.jpg',
+    'AutoFlex Easy: The ultimate tool for Amazon Flex drivers to capture blocks effortlessly and maximize earnings.',
+  url: 'https://autoflexeasy.com', // cambia esto por tu dominio real
+  ogImage: 'https://autoflexeasy.com/og.jpg', // la imagen para compartir en redes
   links: {
-    twitter: 'https://twitter.com/antoineross__',
-    github: 'https://github.com/antoineross/hikari'
+    twitter: 'https://twitter.com/AutoFlexEasy', // tu Twitter
+    github: 'https://github.com/tu-usuario/AutoFlexEasy' // tu repositorio si aplica
   }
 };
