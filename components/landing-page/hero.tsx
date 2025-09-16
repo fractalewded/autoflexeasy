@@ -74,12 +74,12 @@ export default function HeroSection() {
           )}
 
           <h1 className="font-heading tracking-tight font-bold text-2xl sm:text-4xl md:text-5xl lg:text-6xl">
-            A Complete & Open Source Next.js 14 SaaS Template Using Supabase
-          </h1>
-          <div className="max-w-[42rem] font-bold tracking-tight text-primary sm:text-xl sm:leading-8 rounded-full p-2">
-            I&apos;m building a modern web app with Next.js 14 & Supabase and open
-            sourcing everything. Follow along as we figure this out together.
-          </div>
+  AutoFlex Easy: The Ultimate Tool for Amazon Flex Drivers
+</h1>
+<div className="max-w-[42rem] font-bold tracking-tight text-primary sm:text-xl sm:leading-8 rounded-full p-2">
+  Effortlessly capture blocks, maximize your earnings, and take control of your 
+  Amazon Flex delivery schedule with our powerful tool.
+</div>
           <div className="flex flex-wrap justify-center gap-4">
             <Link href="/login" className={cn(buttonVariants({ size: 'xl' }), 'rounded-full border-2 border-primary dark:border-white text-bold text-white')}>
               Get Started
