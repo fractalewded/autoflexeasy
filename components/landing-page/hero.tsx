@@ -10,9 +10,7 @@ import AnimatedGradientText from '@/components/magicui/animated-shiny-text';
 import { ArrowRightIcon, GitHubLogoIcon } from '@radix-ui/react-icons';
 import AvatarCircles from '@/components/magicui/avatar-circles';
 import { useTheme } from 'next-themes';
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel"
-import { useState, useEffect, useRef } from 'react'
-import Image from 'next/image'
+import { useState, useEffect } from 'react';
 
 export default function HeroSection() {
   const { theme } = useTheme();
@@ -29,15 +27,15 @@ export default function HeroSection() {
     { text: "So cool, looks really clean. Any plan to open source it? ☺️ Wanna play with it!", author: "SaidAitmbarek", title: "Founder of microlaunch.net", avatarFallback: "SA", avatarImg: "/images/said.jpg" },
   ];
 
-  const [currentQuote, setCurrentQuote] = useState(0)
+  const [currentQuote, setCurrentQuote] = useState(0);
 
   useEffect(() => {
     const intervalId = setInterval(() => {
-      setCurrentQuote((prevQuote) => (prevQuote + 1) % quotes.length)
-    }, 5000) // Change quote every 5 seconds
+      setCurrentQuote((prevQuote) => (prevQuote + 1) % quotes.length);
+    }, 5000); // Change quote every 5 seconds
 
-    return () => clearInterval(intervalId)
-  }, [])
+    return () => clearInterval(intervalId);
+  }, []);
 
   return (
     <section className="relative w-full overflow-hidden">
@@ -53,7 +51,6 @@ export default function HeroSection() {
       </div>
       <div className="container mx-auto px-4 py-12 md:py-16 lg:py-32">
         <div className="relative z-10 flex max-w-[64rem] flex-col items-center gap-4 text-center mx-auto">
-          {/* Cambio aplicado aquí: renderizado condicional para el enlace de Twitter */}
           {siteConfig.links.twitter && (
             <Link href={siteConfig.links.twitter} className="w-fit">
               <div
@@ -76,7 +73,7 @@ export default function HeroSection() {
             </Link>
           )}
 
-          <h1 className="font-heading tracking-tight   font-bold text-2xl sm:text-4xl md:text-5xl lg:text-6xl">
+          <h1 className="font-heading tracking-tight font-bold text-2xl sm:text-4xl md:text-5xl lg:text-6xl">
             A Complete & Open Source Next.js 14 SaaS Template Using Supabase
           </h1>
           <div className="max-w-[42rem] font-bold tracking-tight text-primary sm:text-xl sm:leading-8 rounded-full p-2">
@@ -87,7 +84,6 @@ export default function HeroSection() {
             <Link href="/login" className={cn(buttonVariants({ size: 'xl' }), 'rounded-full border-2 border-primary dark:border-white text-bold text-white')}>
               Get Started
             </Link>
-            {/* Cambio aplicado aquí: renderizado condicional para el enlace de GitHub */}
             {siteConfig.links.github && (
               <Link
                 href={siteConfig.links.github}
@@ -108,7 +104,7 @@ export default function HeroSection() {
                     key={i}
                     className="fill-yellow-200 text-yellow-300 size-5"
                   />
-                )}
+                ))}
               </div>
               <span className="text-xs font-semibold">
                 Join 160+ developers
