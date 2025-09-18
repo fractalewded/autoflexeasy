@@ -8,31 +8,36 @@ interface Plan {
 
 const pricingPlans: Plan[] = [
   {
-    name: 'Plan Semanal',
-    description: 'Acceso completo por 7 días. Ideal para probar el servicio.',
+    name: 'Weekly Plan',
+    description: 'Full access for 7 days. Perfect for testing our service.',
     features: [
-      'Captura automática de bloques 24/7',
-      'Alertas instantáneas en tu móvil',
-      'Soporte prioritario por WhatsApp',
-      'Actualizaciones gratuitas',
-      'Garantía de satisfacción de 7 días'
+      '24/7 automatic block capture',
+      'Instant mobile alerts',
+      'Priority WhatsApp support',
+      'Free updates',
+      '7-day satisfaction guarantee',
+      'Referral program: Earn 10% commission'
     ],
-    monthlyPrice: 2500, // $25.00 en centavos
-    yearlyPrice: 0 // No aplica para plan semanal
+    monthlyPrice: 2500, // $25.00 in cents
+    yearlyPrice: 0 // Not applicable for weekly plan
   },
   {
-    name: 'Plan Mensual',
-    description: 'Acceso completo por 30 días. El favorito de los conductores.',
+    name: 'Monthly Plan',
+    description: 'Full access for 30 days. Our most popular choice.',
     features: [
-      'Todo lo del plan semanal',
-      'Estadísticas de rendimiento avanzadas',
-      'Acceso a bloques exclusivos',
-      'Soporte prioritario 24/7',
-      'Configuraciones personalizadas',
-      'Ahorras $40 vs el plan semanal'
+      '24/7 automatic block capture',
+      'Instant mobile alerts',
+      'Priority WhatsApp support',
+      'Free updates',
+      '30-day satisfaction guarantee',
+      'Advanced performance statistics',
+      'Access to exclusive blocks',
+      '24/7 priority support',
+      'Custom configurations',
+      'Referral program: Earn 15% commission'
     ],
-    monthlyPrice: 9000, // $90.00 en centavos
-    yearlyPrice: 0 // No aplica para plan mensual
+    monthlyPrice: 9000, // $90.00 in cents
+    yearlyPrice: 0 // Not applicable for monthly plan
   }
 ];
 
@@ -49,8 +54,8 @@ interface ProductWithPrices extends Product {
 export const dummyPricing: ProductWithPrices[] = [
   {
     id: 'weekly-plan',
-    name: 'Plan Semanal',
-    description: 'Acceso completo por 7 días',
+    name: 'Weekly Plan',
+    description: 'Full access for 7 days',
     prices: [
       {
         id: 'weekly-price',
@@ -72,8 +77,8 @@ export const dummyPricing: ProductWithPrices[] = [
   },
   {
     id: 'monthly-plan',
-    name: 'Plan Mensual',
-    description: 'Acceso completo por 30 días',
+    name: 'Monthly Plan',
+    description: 'Full access for 30 days',
     prices: [
       {
         id: 'monthly-price',

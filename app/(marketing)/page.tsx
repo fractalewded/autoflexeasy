@@ -10,7 +10,7 @@ export default async function IndexPage() {
     <div className="flex-col gap-10 mb-5">
       <Hero />
        {/* <LogoCloud /> */} {/* ← COMENTA esta línea */}
-      <FeaturesHover />
+       {/*<FeaturesHover />*/}
       <Pricing />
       <Testimonials />
       <FAQSection />
