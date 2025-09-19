@@ -27,8 +27,6 @@ export default function HeroSection() {
 
       <div className="container mx-auto px-4 py-12 md:py-16 lg:py-32">
         <div className="relative z-10 mx-auto flex max-w-[64rem] flex-col items-center gap-4 text-center">
-          {/* (Removed Twitter/X CTA, avatars, stars, and quotes) */}
-
           <h1 className="font-heading text-2xl font-bold tracking-tight sm:text-4xl md:text-5xl lg:text-6xl">
             AutoFlex Easy: The Ultimate Tool for Amazon Flex Drivers
           </h1>
@@ -39,7 +37,6 @@ export default function HeroSection() {
           </div>
 
           <div className="flex flex-wrap justify-center gap-4">
-            {/* Internal route */}
             <Link
               href="/login"
               className={cn(
@@ -50,7 +47,6 @@ export default function HeroSection() {
               Get Started
             </Link>
 
-            {/* External link (GitHub) */}
             {siteConfig?.links?.github ? (
               <a
                 href={siteConfig.links.github}
