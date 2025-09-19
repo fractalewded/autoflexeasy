@@ -31,11 +31,10 @@ export default function HeroSection() {
 
   useEffect(() => {
     const intervalId = setInterval(() => {
-      setCurrentQuote((prevQuote) => (prevQuote + 1) % quotes.length);
-    }, 5000); // Change quote every 5 seconds
-
+      setCurrentQuote((prev) => (prev + 1) % quotes.length);
+    }, 5000);
     return () => clearInterval(intervalId);
-  }, []);
+  }, [quotes.length]);
 
   return (
     <section className="relative w-full overflow-hidden">
@@ -49,66 +48,81 @@ export default function HeroSection() {
         />
         <Ripple />
       </div>
+
       <div className="container mx-auto px-4 py-12 md:py-16 lg:py-32">
-        <div className="relative z-10 flex max-w-[64rem] flex-col items-center gap-4 text-center mx-auto">
-          {siteConfig.links.twitter && (
-            <Link href={siteConfig.links.twitter} className="w-fit">
+        <div className="relative z-10 mx-auto flex max-w-[64rem] flex-col items-center gap-4 text-center">
+          {siteConfig?.links?.twitter ? (
+            <a
+              href={siteConfig.links.twitter}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-fit"
+            >
               <div
                 className={cn(
                   'group rounded-full border border-black/5 bg-neutral-100 text-base text-secondary transition-all ease-in hover:cursor-pointer hover:bg-neutral-200 dark:border-white/5 dark:bg-neutral-900 dark:hover:bg-neutral-800',
                 )}
               >
                 <AnimatedGradientText className="inline-flex items-center justify-center px-4 py-2 transition ease-out hover:text-neutral-600 hover:duration-300 hover:dark:text-neutral-400">
-                  🎉 <hr className="mx-2 h-4 w-[1px] shrink-0 bg-gray-300" />{" "}
+                  🎉 <hr className="mx-2 h-4 w-[1px] shrink-0 bg-gray-300" />{' '}
                   <span
                     className={cn(
-                      `inline animate-gradient bg-gradient-to-r from-[#b76a24] via-[#6a24b7] to-[#b76a24] bg-[length:var(--bg-size)_100%] bg-clip-text text-transparent`,
+                      'inline animate-gradient bg-gradient-to-r from-[#b76a24] via-[#6a24b7] to-[#b76a24] bg-[length:var(--bg-size)_100%] bg-clip-text text-transparent',
                     )}
                   >
                     Follow the progress on X
-                  </span>                
+                  </span>
                   <ArrowRightIcon className="ml-2 size-4 transition-transform duration-300 ease-in-out group-hover:translate-x-0.5" />
                 </AnimatedGradientText>
               </div>
-            </Link>
-          )}
+            </a>
+          ) : null}
 
-          <h1 className="font-heading tracking-tight font-bold text-2xl sm:text-4xl md:text-5xl lg:text-6xl">
-  AutoFlex Easy: The Ultimate Tool for Amazon Flex Drivers
-</h1>
-<div className="max-w-[42rem] font-bold tracking-tight text-primary sm:text-xl sm:leading-8 rounded-full p-2">
-  Effortlessly capture blocks, maximize your earnings, and take control of your 
-  Amazon Flex delivery schedule with our powerful tool.
-</div>
+          <h1 className="font-heading text-2xl font-bold tracking-tight sm:text-4xl md:text-5xl lg:text-6xl">
+            AutoFlex Easy: The Ultimate Tool for Amazon Flex Drivers
+          </h1>
+
+          <div className="max-w-[42rem] rounded-full p-2 font-bold tracking-tight text-primary sm:text-xl sm:leading-8">
+            Effortlessly capture blocks, maximize your earnings, and take control of your
+            Amazon Flex delivery schedule with our powerful tool.
+          </div>
+
           <div className="flex flex-wrap justify-center gap-4">
-            <Link href="/login" className={cn(buttonVariants({ size: 'xl' }), 'rounded-full border-2 border-primary dark:border-white text-bold text-white')}>
+            {/* Internal route → keep Next Link */}
+            <Link
+              href="/login"
+              className={cn(
+                buttonVariants({ size: 'xl' }),
+                'rounded-full border-2 border-primary dark:border-white font-bold text-white',
+              )}
+            >
               Get Started
             </Link>
-            {siteConfig.links.github && (
-              <Link
+
+            {siteConfig?.links?.github ? (
+              <a
                 href={siteConfig.links.github}
                 target="_blank"
-                rel="noreferrer"
-                className={cn(buttonVariants({ variant: 'outline', size: 'xl' }), 'rounded-full border-2 border-primary dark:border-white text-semibold')}
+                rel="noopener noreferrer"
+                className={cn(
+                  buttonVariants({ variant: 'outline', size: 'xl' }),
+                  'rounded-full border-2 border-primary dark:border-white font-semibold',
+                )}
               >
                 GitHub <GitHubLogoIcon className="ml-2" />
-              </Link>
-            )}
+              </a>
+            ) : null}
           </div>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-2 w-full">
+
+          <div className="mt-2 flex w-full flex-col items-center justify-center gap-4 sm:flex-row">
             <AvatarCircles numPeople={155} avatarUrls={avatarUrls} />
-            <div className="flex flex-col mt-2">
+            <div className="mt-2 flex flex-col">
               <div className="flex flex-row justify-center sm:justify-start">
                 {[...Array(5)].map((_, i) => (
-                  <Star
-                    key={i}
-                    className="fill-yellow-200 text-yellow-300 size-5"
-                  />
+                  <Star key={i} className="size-5 fill-yellow-200 text-yellow-300" />
                 ))}
               </div>
-              <span className="text-xs font-semibold">
-                Join 160+ developers
-              </span>
+              <span className="text-xs font-semibold">Join 160+ developers</span>
             </div>
           </div>
         </div>
