@@ -38,7 +38,7 @@ export default function HeroSection() {
 
           <div className="flex flex-wrap justify-center gap-4">
             <Link
-              href="/login"
+              href="/signin"
               className={cn(
                 buttonVariants({ size: 'xl' }),
                 'rounded-full border-2 border-primary dark:border-white font-bold text-white',

@@ -16,7 +16,7 @@ export default function SignUp() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    setIsSubmitting(true); // Disable the button while the request is being handled
+    setIsSubmitting(true);
     await handleRequest(e, signUp, router);
     setIsSubmitting(false);
   };
@@ -43,6 +43,25 @@ export default function SignUp() {
                 Enter your details below to create an account
               </p>
             </div>
+            
+            {/* Cubo 3D reemplazando el texto */}
+            <div className="flex justify-center my-6">
+              <div className="cube-container">
+                <div className="cube">
+                  <div className="cube-face cube-face-front">
+                    <span>AutoFlex</span>
+                  </div>
+                  <div className="cube-face cube-face-back">
+                    <span>Easy</span>
+                  </div>
+                  <div className="cube-face cube-face-right"></div>
+                  <div className="cube-face cube-face-left"></div>
+                  <div className="cube-face cube-face-top"></div>
+                  <div className="cube-face cube-face-bottom"></div>
+                </div>
+              </div>
+            </div>
+            
             <form
               noValidate={true}
               className="grid gap-4"
@@ -102,16 +121,125 @@ export default function SignUp() {
                 Sign up with Google
               </Button>
             </div>
-            <p className="text-muted-foreground text-xs text-center my-2">
-              For testing purposes, only Github is available.
-            </p>
           </CardContent>
         </Card>
       </div>
+      
+      {/* Estilos para el cubo 3D */}
+      <style jsx>{`
+        .cube-container {
+          perspective: 1000px;
+          width: 120px;
+          height: 120px;
+        }
+        
+        .cube {
+          width: 100%;
+          height: 100%;
+          position: relative;
+          transform-style: preserve-3d;
+          animation: rotate 10s infinite linear;
+        }
+        
+        .cube-face {
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: bold;
+          font-size: 16px;
+          color: white;
+          backface-visibility: visible;
+          border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .cube-face-front {
+          background: linear-gradient(135deg, #2563eb, #1e40af);
+          transform: translateZ(60px);
+        }
+        
+        .cube-face-back {
+          background: linear-gradient(135deg, #059669, #065f46);
+          transform: rotateY(180deg) translateZ(60px);
+        }
+        
+        .cube-face-right {
+          background: linear-gradient(135deg, #dc2626, #7f1d1d);
+          transform: rotateY(90deg) translateZ(60px);
+        }
+        
+        .cube-face-left {
+          background: linear-gradient(135deg, #d97706, #78350f);
+          transform: rotateY(-90deg) translateZ(60px);
+        }
+        
+        .cube-face-top {
+          background: linear-gradient(135deg, #7c3aed, #5b21b6);
+          transform: rotateX(90deg) translateZ(60px);
+        }
+        
+        .cube-face-bottom {
+          background: linear-gradient(135deg, #0ea5e9, #0369a1);
+          transform: rotateX(-90deg) translateZ(60px);
+        }
+        
+        @keyframes rotate {
+          from {
+            transform: rotateX(0) rotateY(0) rotateZ(0);
+          }
+          to {
+            transform: rotateX(360deg) rotateY(360deg) rotateZ(360deg);
+          }
+        }
+        
+        /* Responsive design */
+        @media (max-width: 640px) {
+          .cube-container {
+            width: 100px;
+            height: 100px;
+          }
+          
+          .cube-face {
+            font-size: 14px;
+          }
+          
+          .cube-face-front,
+          .cube-face-back,
+          .cube-face-right,
+          .cube-face-left,
+          .cube-face-top,
+          .cube-face-bottom {
+            transform: translateZ(50px);
+          }
+          
+          .cube-face-back {
+            transform: rotateY(180deg) translateZ(50px);
+          }
+          
+          .cube-face-right {
+            transform: rotateY(90deg) translateZ(50px);
+          }
+          
+          .cube-face-left {
+            transform: rotateY(-90deg) translateZ(50px);
+          }
+          
+          .cube-face-top {
+            transform: rotateX(90deg) translateZ(50px);
+          }
+          
+          .cube-face-bottom {
+            transform: rotateX(-90deg) translateZ(50px);
+          }
+        }
+      `}</style>
     </div>
   );
 }
 
+// Los iconos se mantienen igual...
 function ArrowLeftIcon(props: any) {
   return (
     <svg
