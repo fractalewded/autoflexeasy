@@ -138,9 +138,7 @@ export default function SignIn() {
                 </form>
               ))}
             </div>
-            <p className="text-muted-foreground text-xs text-center my-2">
-              For testing purposes, only Github is available.
-            </p>
+           
           </CardContent>
         </Card>
       </div>

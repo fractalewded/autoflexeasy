@@ -6,7 +6,8 @@ import {
   ShoppingCart,
   Users2,
   Inbox,
-  FileText
+  FileText,
+  Bot // ✅ Icono de Robot agregado
 } from 'lucide-react';
 
 export interface NavItem {
@@ -22,11 +23,13 @@ export const iconComponents = {
   FileText,
   Package,
   Users2,
-  LineChart
+  LineChart,
+  Bot // ✅ Icono agregado a los componentes
 };
 
 export const navConfig = [
   { href: '/dashboard', icon: 'Inbox', label: 'Dashboard' },
+  { href: '/dashboard/robot', icon: 'Bot', label: 'Robot Control' }, // ✅ Nueva opción
   // { href: '/dashboard/posts', icon: 'FileText', label: 'Posts' },
   {
     href: '/dashboard/customer',
