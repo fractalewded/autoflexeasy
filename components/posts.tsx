@@ -132,40 +132,46 @@ export default function Posts({ user }: PostsProps) {
       <div className="header">
         <h1>Blog Management</h1>
         <div className="status-indicator status-active">
-          <i className="fas fa-circle"></i> Sistema Activo
+          <span className="status-dot"></span> Sistema Activo
         </div>
       </div>
 
-      <div className="container mx-auto p-4">
+      <div className="dashboard-content">
         <Card className="mb-8">
           <CardHeader>
             <CardTitle>{editingPost ? 'Edit Post' : 'Create New Post'}</CardTitle>
           </CardHeader>
           <CardContent>
-            <Input
-              placeholder="Post Title"
-              value={editingPost ? editingPost.title : newPost.title}
-              onChange={(e) => editingPost 
-                ? setEditingPost({...editingPost, title: e.target.value})
-                : setNewPost({...newPost, title: e.target.value})
-              }
-              className="mb-4"
-            />
-            <Textarea
-              placeholder="Post Content"
-              value={editingPost ? editingPost.content || '' : newPost.content}
-              onChange={(e) => editingPost
-                ? setEditingPost({...editingPost, content: e.target.value})
-                : setNewPost({...newPost, content: e.target.value})
-              }
-              className="mb-4"
-            />
+            <div className="form-group">
+              <Input
+                placeholder="Post Title"
+                value={editingPost ? editingPost.title : newPost.title}
+                onChange={(e) => editingPost 
+                  ? setEditingPost({...editingPost, title: e.target.value})
+                  : setNewPost({...newPost, title: e.target.value})
+                }
+                className="mb-4"
+              />
+            </div>
+            <div className="form-group">
+              <Textarea
+                placeholder="Post Content"
+                value={editingPost ? editingPost.content || '' : newPost.content}
+                onChange={(e) => editingPost
+                  ? setEditingPost({...editingPost, content: e.target.value})
+                  : setNewPost({...newPost, content: e.target.value})
+                }
+                className="mb-4"
+              />
+            </div>
           </CardContent>
           <CardFooter>
             {editingPost ? (
-              <Button onClick={handleUpdatePost}>Update Post</Button>
+              <Button onClick={handleUpdatePost} className="btn btn-primary">
+                Update Post
+              </Button>
             ) : (
-              <Button onClick={handleCreatePost}>
+              <Button onClick={handleCreatePost} className="btn btn-primary">
                 <PlusCircle className="mr-2 h-4 w-4" /> Create Post
               </Button>
             )}
@@ -180,26 +186,37 @@ export default function Posts({ user }: PostsProps) {
               <p className="text-muted-foreground mb-4">
                 Create your first post to get started!
               </p>
-              <Button onClick={() => document.querySelector('input')?.focus()}>
+              <Button 
+                onClick={() => document.querySelector('input')?.focus()}
+                className="btn btn-primary"
+              >
                 <PlusCircle className="mr-2 h-4 w-4" /> Create Your First Post
               </Button>
             </CardContent>
           </Card>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="blog-grid">
             {posts.map(post => (
-              <Card key={post.id}>
+              <Card key={post.id} className="blog-card">
                 <CardHeader>
-                  <CardTitle>{post.title}</CardTitle>
+                  <CardTitle className="blog-title">{post.title}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-muted-foreground">{post.content}</p>
+                  <p className="blog-content">{post.content}</p>
                 </CardContent>
-                <CardFooter className="flex justify-between">
-                  <Button variant="outline" onClick={() => setEditingPost(post)}>
+                <CardFooter className="blog-actions">
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setEditingPost(post)}
+                    className="btn btn-secondary"
+                  >
                     <Edit className="mr-2 h-4 w-4" /> Edit
                   </Button>
-                  <Button variant="destructive" onClick={() => handleDeletePost(post.id)}>
+                  <Button 
+                    variant="destructive" 
+                    onClick={() => handleDeletePost(post.id)}
+                    className="btn btn-error"
+                  >
                     <Trash className="mr-2 h-4 w-4" /> Delete
                   </Button>
                 </CardFooter>
@@ -208,6 +225,152 @@ export default function Posts({ user }: PostsProps) {
           </div>
         )}
       </div>
+
+      <style jsx>{`
+        .main-content {
+          flex: 1;
+          margin-left: 250px;
+          padding: 30px;
+          background-color: #f8fafc;
+          min-height: 100vh;
+        }
+        
+        .header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 30px;
+          padding-bottom: 15px;
+          border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .header h1 {
+          font-size: 2rem;
+          font-weight: 700;
+          color: #2563eb;
+        }
+        
+        .status-indicator {
+          display: inline-flex;
+          align-items: center;
+          padding: 8px 16px;
+          border-radius: 20px;
+          font-size: 0.9rem;
+          font-weight: 500;
+        }
+        
+        .status-active {
+          background: rgba(16, 185, 129, 0.1);
+          color: #10b981;
+        }
+        
+        .status-dot {
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background-color: #10b981;
+          margin-right: 8px;
+        }
+        
+        .dashboard-content {
+          max-width: 1200px;
+          margin: 0 auto;
+        }
+        
+        .form-group {
+          margin-bottom: 20px;
+        }
+        
+        .blog-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+          gap: 20px;
+        }
+        
+        .blog-card {
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .blog-card:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .blog-title {
+          font-size: 1.2rem;
+          font-weight: 600;
+          color: #1e293b;
+        }
+        
+        .blog-content {
+          color: #64748b;
+          line-height: 1.5;
+        }
+        
+        .blog-actions {
+          display: flex;
+          justify-content: space-between;
+          padding-top: 15px;
+          border-top: 1px solid #e2e8f0;
+        }
+        
+        .btn {
+          padding: 8px 16px;
+          border-radius: 6px;
+          font-weight: 500;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          display: inline-flex;
+          align-items: center;
+        }
+        
+        .btn-primary {
+          background-color: #2563eb;
+          color: white;
+          border: none;
+        }
+        
+        .btn-primary:hover {
+          background-color: #1e40af;
+        }
+        
+        .btn-secondary {
+          background-color: transparent;
+          color: #64748b;
+          border: 1px solid #e2e8f0;
+        }
+        
+        .btn-secondary:hover {
+          background-color: #f1f5f9;
+        }
+        
+        .btn-error {
+          background-color: #ef4444;
+          color: white;
+          border: none;
+        }
+        
+        .btn-error:hover {
+          background-color: #dc2626;
+        }
+        
+        @media (max-width: 768px) {
+          .main-content {
+            margin-left: 0;
+            padding: 20px;
+          }
+          
+          .header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 15px;
+          }
+          
+          .blog-grid {
+            grid-template-columns: 1fr;
+          }
+        }
+      `}</style>
     </div>
   );
 }
