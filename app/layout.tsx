@@ -98,7 +98,7 @@ export default async function RootLayout({ children }: PropsWithChildren) {
         
         {/* BOTÓN FLOTANTE DE WHATSAPP - AGREGADO */}
          <a 
-    href="https://wa.me/1234567890?text=Hola,%20me%20interesa%20AutoFlex%20Easy" 
+    href="https://wa.me/+541171329439?text=Hello,%20could%20you%20give%20me%20information%20about%20AutoFlex?" 
     className="whatsapp-float" 
     target="_blank" 
     rel="noopener noreferrer"

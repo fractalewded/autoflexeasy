@@ -22,11 +22,11 @@ export default function RobotDashboard() {
   });
 
   const stations = [
-    { id: 'station1', name: 'Estación Centro' },
-    { id: 'station2', name: 'Estación Norte' },
-    { id: 'station3', name: 'Estación Sur' },
-    { id: 'station4', name: 'Estación Este' },
-    { id: 'station5', name: 'Estación Oeste' }
+    { id: 'station1', name: 'Actualizando Estación ' },
+    { id: 'station2', name: 'Actualizando Estación ' },
+    { id: 'station3', name: 'Actualizando Estación ' },
+    { id: 'station4', name: 'Actualizando Estación ' },
+    { id: 'station5', name: 'Actualizando Estación ' }
   ];
 
   const daysOfWeek = [

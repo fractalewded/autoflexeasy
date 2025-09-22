@@ -17,7 +17,7 @@ export default function FooterBlog() {
               <p className="text-sm text-muted-foreground">
                 Built with ❤️ by{' '}
                 <a
-                  href="https://x.com/antoineross__"
+                  href="https://x.com/AutoFlex Easy__"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="underline"
@@ -26,7 +26,7 @@ export default function FooterBlog() {
                 </a>
               </p>
               <a
-                href="https://github.com/antoineross/hikari"
+                href="#"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-muted-foreground hover:text-primary"
@@ -34,7 +34,7 @@ export default function FooterBlog() {
                 <Github className="h-5 w-5" />
               </a>
               <a
-                href="https://x.com/antoineross__"
+                href="https://x.com/AutoFlexEasy"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-muted-foreground hover:text-primary"
