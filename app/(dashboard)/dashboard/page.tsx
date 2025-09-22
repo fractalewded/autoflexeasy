@@ -1,10 +1,9 @@
 import { createClient } from '@/utils/supabase/server';
 import {
   getUser,
-  getUserDetails,
-  getSubscription
+  getUserDetails
 } from '@/utils/supabase/queries';
-import Posts from '@/components/posts';
+import RobotDashboard from '@/components/robot/RobotDashboard';
 import { redirect } from 'next/navigation';
 
 export default async function DashboardPage() {
@@ -12,7 +11,7 @@ export default async function DashboardPage() {
   const [user, userDetails] = await Promise.all([
     getUser(supabase),
     getUserDetails(supabase)
-    ]);
+  ]);
 
   if (!user) {
     return redirect('/signin');
@@ -20,7 +19,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="flex min-h-screen w-full flex-col bg-muted/40 gap-4">
-      <Posts user={user} />
+      <RobotDashboard />
     </div>
   );
 }
