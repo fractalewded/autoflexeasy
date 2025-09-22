@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
-import { Bot, Battery, Cpu, Memory, Navigation, Zap } from 'lucide-react';
+import { Bot, Battery, Cpu, HardDrive, Navigation, Zap } from 'lucide-react'; // ✅ Corregido
 
 export default function RobotDashboard() {
   const [robotData, setRobotData] = useState({
@@ -132,7 +132,7 @@ export default function RobotDashboard() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Memory Usage</CardTitle>
-            <Memory className="h-4 w-4 text-muted-foreground" />
+            <HardDrive className="h-4 w-4 text-muted-foreground" /> {/* ✅ Corregido */}
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{robotData.memoryUsage.toFixed(1)}%</div>
