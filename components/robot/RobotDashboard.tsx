@@ -1,6 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
+import { Badge } from "@/components/ui/badge";
+import { Play, Pause, Square, Battery, Clock, Package, MapPin, Bell } from 'lucide-react';
 
 export default function RobotDashboard() {
   const [status, setStatus] = useState('active');
@@ -55,168 +60,198 @@ export default function RobotDashboard() {
     });
   };
 
+  const getStatusVariant = () => {
+    switch (status) {
+      case 'active': return 'default';
+      case 'paused': return 'secondary';
+      case 'stopped': return 'destructive';
+      default: return 'outline';
+    }
+  };
+
+  const getStatusText = () => {
+    switch (status) {
+      case 'active': return 'Active';
+      case 'paused': return 'Paused';
+      case 'stopped': return 'Stopped';
+      default: return 'Unknown';
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-gray-100 p-6">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen p-6 bg-background">
+      <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-800">Robot Control Panel</h1>
-            <p className="text-gray-600">Amazon Flex Management System</p>
+            <h1 className="text-3xl font-bold tracking-tight">Robot Control Panel</h1>
+            <p className="text-muted-foreground">Amazon Flex Management System</p>
           </div>
-          <div className="mt-4 md:mt-0 text-right">
-            <div className="text-2xl font-semibold text-gray-700">{formatTime(currentTime)}</div>
-            <div className="text-gray-500">{formatDate(currentTime)}</div>
+          <div className="text-right">
+            <div className="text-2xl font-semibold">{formatTime(currentTime)}</div>
+            <div className="text-sm text-muted-foreground">{formatDate(currentTime)}</div>
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Robot Status */}
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-xl font-semibold mb-4 text-gray-700 border-b pb-2">Robot Status</h2>
-            
-            <div className="mb-4 flex items-center">
-              <span className="text-gray-600 mr-2">Status:</span>
-              <span className={`font-semibold ${
-                status === 'active' ? 'text-green-600' : 
-                status === 'paused' ? 'text-yellow-600' : 'text-red-600'
-              }`}>
-                {status === 'active' ? 'Active' : status === 'paused' ? 'Paused' : 'Stopped'}
-              </span>
-              <div className={`ml-2 w-3 h-3 rounded-full ${
-                status === 'active' ? 'bg-green-500' : 
-                status === 'paused' ? 'bg-yellow-500' : 'bg-red-500'
-              }`}></div>
-            </div>
-            
-            <div className="mb-4">
-              <span className="text-gray-600 mr-2">Battery:</span>
-              <span className="font-semibold">{batteryLevel.toFixed(1)}%</span>
-              <div className="w-full bg-gray-200 rounded-full h-2.5 mt-1">
-                <div 
-                  className={`h-2.5 rounded-full ${
-                    batteryLevel > 50 ? 'bg-green-500' : 
-                    batteryLevel > 20 ? 'bg-yellow-500' : 'bg-red-500'
-                  }`} 
-                  style={{ width: `${batteryLevel}%` }}
-                ></div>
+          {/* Robot Status Card */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Robot Status</CardTitle>
+              <CardDescription>Current status and performance metrics</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium">Status</span>
+                <Badge variant={getStatusVariant()}>{getStatusText()}</Badge>
               </div>
-            </div>
-            
-            <div className="mb-4">
-              <span className="text-gray-600 mr-2">Connected:</span>
-              <span className="font-semibold text-green-600">Yes</span>
-            </div>
-            
-            <div className="mb-4">
-              <span className="text-gray-600 mr-2">Tasks completed:</span>
-              <span className="font-semibold">24/30</span>
-            </div>
-            
-            <div className="mt-4 p-3 bg-gray-50 rounded-lg">
-              <h3 className="font-medium text-gray-700 mb-2">Today's Statistics</h3>
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <p className="text-sm text-gray-600">Packages delivered</p>
-                  <p className="font-semibold">18</p>
+              
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium">Battery</span>
+                  <span className="text-sm">{batteryLevel.toFixed(1)}%</span>
                 </div>
-                <div>
-                  <p className="text-sm text-gray-600">Active time</p>
-                  <p className="font-semibold">5h 22m</p>
-                </div>
+                <Progress value={batteryLevel} className="h-2" />
               </div>
-            </div>
-          </div>
+              
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium">Connected</span>
+                <Badge variant="outline" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">Yes</Badge>
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium">Tasks completed</span>
+                <span className="text-sm font-medium">24/30</span>
+              </div>
+            </CardContent>
+          </Card>
 
-          {/* Controls */}
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-xl font-semibold mb-4 text-gray-700 border-b pb-2">Controls</h2>
-            
-            <div className="flex flex-wrap gap-3 mb-6">
-              <button 
-                onClick={handleStart}
-                className={`px-4 py-3 rounded-lg flex-1 min-w-[120px] flex items-center justify-center ${
-                  status === 'active' 
-                    ? 'bg-green-500 text-white' 
-                    : 'bg-green-100 text-green-700 hover:bg-green-200'
-                } transition-colors`}
-              >
-                <i className="fas fa-play mr-2"></i>
-                Start
-              </button>
-              
-              <button 
-                onClick={handlePause}
-                className={`px-4 py-3 rounded-lg flex-1 min-w-[120px] flex items-center justify-center ${
-                  status === 'paused' 
-                    ? 'bg-yellow-500 text-white' 
-                    : 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200'
-                } transition-colors`}
-              >
-                <i className="fas fa-pause mr-2"></i>
-                Pause
-              </button>
-              
-              <button 
-                onClick={handleStop}
-                className={`px-4 py-3 rounded-lg flex-1 min-w-[120px] flex items-center justify-center ${
-                  status === 'stopped' 
-                    ? 'bg-red-500 text-white' 
-                    : 'bg-red-100 text-red-700 hover:bg-red-200'
-                } transition-colors`}
-              >
-                <i className="fas fa-stop mr-2"></i>
-                Stop
-              </button>
-            </div>
-            
-            <div className="mb-6">
-              <h3 className="font-medium text-gray-700 mb-2">Quick Actions</h3>
-              <div className="grid grid-cols-2 gap-3">
-                <button className="px-3 py-2 bg-blue-100 text-blue-700 rounded-lg text-sm hover:bg-blue-200 transition-colors">
-                  <i className="fas fa-route mr-1"></i>
-                  Optimize route
-                </button>
-                <button className="px-3 py-2 bg-purple-100 text-purple-700 rounded-lg text-sm hover:bg-purple-200 transition-colors">
-                  <i className="fas fa-battery-bolt mr-1"></i>
-                  Power saving mode
-                </button>
+          {/* Controls Card */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Controls</CardTitle>
+              <CardDescription>Manage robot operations</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex flex-col sm:flex-row gap-2">
+                <Button 
+                  onClick={handleStart}
+                  className="flex-1"
+                  variant={status === 'active' ? 'default' : 'outline'}
+                >
+                  <Play className="mr-2 h-4 w-4" />
+                  Start
+                </Button>
+                
+                <Button 
+                  onClick={handlePause}
+                  className="flex-1"
+                  variant={status === 'paused' ? 'secondary' : 'outline'}
+                >
+                  <Pause className="mr-2 h-4 w-4" />
+                  Pause
+                </Button>
+                
+                <Button 
+                  onClick={handleStop}
+                  className="flex-1"
+                  variant={status === 'stopped' ? 'destructive' : 'outline'}
+                >
+                  <Square className="mr-2 h-4 w-4" />
+                  Stop
+                </Button>
               </div>
-            </div>
-            
-            <div className="p-3 bg-gray-50 rounded-lg">
-              <h3 className="font-medium text-gray-700 mb-2">Upcoming Tasks</h3>
-              <ul className="text-sm">
-                <li className="flex justify-between py-1 border-b border-gray-200">
-                  <span>Delivery #45892</span>
-                  <span className="text-gray-600">10:30 AM</span>
-                </li>
-                <li className="flex justify-between py-1 border-b border-gray-200">
-                  <span>Delivery #45893</span>
-                  <span className="text-gray-600">11:15 AM</span>
-                </li>
-                <li className="flex justify-between py-1">
-                  <span>Pickup #32847</span>
-                  <span className="text-gray-600">12:00 PM</span>
-                </li>
-              </ul>
-            </div>
-          </div>
+              
+              <div className="grid grid-cols-2 gap-2">
+                <Button variant="outline" className="h-10">
+                  <MapPin className="mr-2 h-4 w-4" />
+                  Optimize
+                </Button>
+                <Button variant="outline" className="h-10">
+                  <Battery className="mr-2 h-4 w-4" />
+                  Power Save
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Statistics Card */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Today's Statistics</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex flex-col items-center p-3 bg-muted rounded-lg">
+                  <Package className="h-6 w-6 mb-2" />
+                  <span className="text-sm">Packages</span>
+                  <span className="font-semibold">18</span>
+                </div>
+                <div className="flex flex-col items-center p-3 bg-muted rounded-lg">
+                  <Clock className="h-6 w-6 mb-2" />
+                  <span className="text-sm">Active Time</span>
+                  <span className="font-semibold">5h 22m</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Upcoming Tasks Card */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Upcoming Tasks</CardTitle>
+              <CardDescription>Scheduled deliveries and pickups</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <div className="flex justify-between items-center py-2 border-b">
+                  <div>
+                    <p className="font-medium">Delivery #45892</p>
+                    <p className="text-sm text-muted-foreground">123 Main St</p>
+                  </div>
+                  <span className="text-sm font-medium">10:30 AM</span>
+                </div>
+                <div className="flex justify-between items-center py-2 border-b">
+                  <div>
+                    <p className="font-medium">Delivery #45893</p>
+                    <p className="text-sm text-muted-foreground">456 Oak Ave</p>
+                  </div>
+                  <span className="text-sm font-medium">11:15 AM</span>
+                </div>
+                <div className="flex justify-between items-center py-2">
+                  <div>
+                    <p className="font-medium">Pickup #32847</p>
+                    <p className="text-sm text-muted-foreground">789 Pine Rd</p>
+                  </div>
+                  <span className="text-sm font-medium">12:00 PM</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
         
-        {/* Notifications */}
-        <div className="mt-6 bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-xl font-semibold mb-4 text-gray-700 border-b pb-2">System Notifications</h2>
-          <div className="flex items-start">
-            <div className="bg-blue-100 p-3 rounded-full mr-3">
-              <i className="fas fa-info-circle text-blue-500"></i>
+        {/* Notifications Card */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <Bell className="mr-2 h-5 w-5" />
+              System Notifications
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-start gap-3 p-3 bg-muted rounded-lg">
+              <div className="bg-primary/10 p-2 rounded-full">
+                <Bell className="h-4 w-4 text-primary" />
+              </div>
+              <div>
+                <p className="font-medium">Route optimized successfully</p>
+                <p className="text-sm text-muted-foreground">
+                  A new route has been calculated that saves 12 minutes of travel time.
+                </p>
+              </div>
             </div>
-            <div>
-              <p className="font-medium">Route optimized successfully</p>
-              <p className="text-sm text-gray-600">A new route has been calculated that saves 12 minutes of travel time.</p>
-            </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
