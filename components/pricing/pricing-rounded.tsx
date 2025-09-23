@@ -131,20 +131,7 @@ export default function PricingRounded({
             </p>
           )}
           <div className="flex items-center justify-center mt-6 space-x-4">
-            <Button
-              className="rounded-4xl"
-              variant={billingInterval === 'month' ? 'default' : 'outline'}
-              onClick={() => setBillingInterval('month')}
-            >
-              Monthly
-            </Button>
-            <Button
-              className="rounded-4xl"
-              variant={billingInterval === 'year' ? 'default' : 'outline'}
-              onClick={() => setBillingInterval('year')}
-            >
-              Yearly
-            </Button>
+            
           </div>
           <div className="grid gap-6 mt-10 md:grid-cols-3">
             {displayProducts.map((product) => {
