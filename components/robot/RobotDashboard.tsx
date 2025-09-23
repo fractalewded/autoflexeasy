@@ -18,25 +18,25 @@ export default function RobotDashboard() {
   const [schedule, setSchedule] = useState({
     startTime: '08:00',
     endTime: '17:00',
-    days: [1, 2, 3, 4, 5] // Lunes a Viernes
+    days: [1, 2, 3, 4, 5] // Monday to Friday
   });
 
   const stations = [
-    { id: 'station1', name: 'Actualizando Estación ' },
-    { id: 'station2', name: 'Actualizando Estación ' },
-    { id: 'station3', name: 'Actualizando Estación ' },
-    { id: 'station4', name: 'Actualizando Estación ' },
-    { id: 'station5', name: 'Actualizando Estación ' }
+    { id: 'station1', name: 'Downtown Station' },
+    { id: 'station2', name: 'North Station' },
+    { id: 'station3', name: 'South Station' },
+    { id: 'station4', name: 'East Station' },
+    { id: 'station5', name: 'West Station' }
   ];
 
   const daysOfWeek = [
-    { id: 0, name: 'Domingo' },
-    { id: 1, name: 'Lunes' },
-    { id: 2, name: 'Martes' },
-    { id: 3, name: 'Miércoles' },
-    { id: 4, name: 'Jueves' },
-    { id: 5, name: 'Viernes' },
-    { id: 6, name: 'Sábado' }
+    { id: 0, name: 'Sunday' },
+    { id: 1, name: 'Monday' },
+    { id: 2, name: 'Tuesday' },
+    { id: 3, name: 'Wednesday' },
+    { id: 4, name: 'Thursday' },
+    { id: 5, name: 'Friday' },
+    { id: 6, name: 'Saturday' }
   ];
 
   const handleStart = () => {
@@ -79,10 +79,10 @@ export default function RobotDashboard() {
 
   const getStatusText = () => {
     switch (status) {
-      case 'active': return 'Activo';
-      case 'paused': return 'Pausado';
-      case 'inactive': return 'Inactivo';
-      default: return 'Desconocido';
+      case 'active': return 'Active';
+      case 'paused': return 'Paused';
+      case 'inactive': return 'Inactive';
+      default: return 'Unknown';
     }
   };
 
@@ -92,8 +92,8 @@ export default function RobotDashboard() {
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Panel de Control - AutoFlex</h1>
-            <p className="text-muted-foreground">Sistema automatizado para captura de bloques de Amazon Flex</p>
+            <h1 className="text-3xl font-bold tracking-tight">Control Panel - AutoFlex</h1>
+            <p className="text-muted-foreground">Automated system for Amazon Flex block capture</p>
           </div>
           <Badge variant={getStatusVariant()} className="text-sm">
             {getStatusText()}
@@ -101,21 +101,21 @@ export default function RobotDashboard() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Estado del Sistema */}
+          {/* System Status */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center">
                 <Zap className="mr-2 h-5 w-5" />
-                Estado del Sistema
+                System Status
               </CardTitle>
-              <CardDescription>Estado actual y configuración básica</CardDescription>
+              <CardDescription>Current status and basic configuration</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
                 <Label htmlFor="auto-search" className="flex flex-col space-y-1">
-                  <span>Búsqueda Automática</span>
+                  <span>Auto Search</span>
                   <span className="text-xs font-normal text-muted-foreground">
-                    Activar para buscar bloques automáticamente
+                    Enable to automatically search for blocks
                   </span>
                 </Label>
                 <Switch
@@ -127,9 +127,9 @@ export default function RobotDashboard() {
               
               <div className="flex items-center justify-between">
                 <Label htmlFor="notifications" className="flex flex-col space-y-1">
-                  <span>Notificaciones</span>
+                  <span>Notifications</span>
                   <span className="text-xs font-normal text-muted-foreground">
-                    Recibir alertas de nuevos bloques
+                    Receive alerts for new blocks
                   </span>
                 </Label>
                 <Switch
@@ -141,24 +141,24 @@ export default function RobotDashboard() {
               
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Batería</span>
+                  <span className="text-sm font-medium">Battery</span>
                   <span className="text-sm">100%</span>
                 </div>
                 <Progress value={100} className="h-2" />
               </div>
               
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">Bloques capturados</span>
+                <span className="text-sm font-medium">Blocks Captured</span>
                 <span className="text-sm font-medium">0</span>
               </div>
             </CardContent>
           </Card>
 
-          {/* Controles */}
+          {/* Controls */}
           <Card>
             <CardHeader>
-              <CardTitle>Controles</CardTitle>
-              <CardDescription>Gestionar el funcionamiento del sistema</CardDescription>
+              <CardTitle>Controls</CardTitle>
+              <CardDescription>Manage system operations</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex flex-col sm:flex-row gap-2">
@@ -169,7 +169,7 @@ export default function RobotDashboard() {
                   disabled={!isAutoSearchEnabled}
                 >
                   <Play className="mr-2 h-4 w-4" />
-                  Iniciar
+                  Start
                 </Button>
                 
                 <Button 
@@ -179,7 +179,7 @@ export default function RobotDashboard() {
                   disabled={status !== 'active'}
                 >
                   <Pause className="mr-2 h-4 w-4" />
-                  Pausar
+                  Pause
                 </Button>
                 
                 <Button 
@@ -189,35 +189,35 @@ export default function RobotDashboard() {
                   disabled={status === 'inactive'}
                 >
                   <Square className="mr-2 h-4 w-4" />
-                  Detener
+                  Stop
                 </Button>
               </div>
               
               <div className="grid grid-cols-2 gap-2">
                 <Button variant="outline" className="h-10">
                   <Settings className="mr-2 h-4 w-4" />
-                  Configuración
+                  Settings
                 </Button>
                 <Button variant="outline" className="h-10">
                   <MapPin className="mr-2 h-4 w-4" />
-                  Estaciones
+                  Stations
                 </Button>
               </div>
             </CardContent>
           </Card>
 
-          {/* Horario de Trabajo */}
+          {/* Work Schedule */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center">
                 <Clock9 className="mr-2 h-5 w-5" />
-                Horario de Trabajo
+                Work Schedule
               </CardTitle>
-              <CardDescription>Configura tus horarios preferidos para bloques</CardDescription>
+              <CardDescription>Configure preferred block schedules</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label>Horario de activación</Label>
+                <Label>Activation Schedule</Label>
                 <div className="flex items-center gap-2">
                   <input
                     type="time"
@@ -225,7 +225,7 @@ export default function RobotDashboard() {
                     onChange={(e) => setSchedule({...schedule, startTime: e.target.value})}
                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
                   />
-                  <span>a</span>
+                  <span>to</span>
                   <input
                     type="time"
                     value={schedule.endTime}
@@ -236,7 +236,7 @@ export default function RobotDashboard() {
               </div>
               
               <div className="space-y-2">
-                <Label>Días de trabajo</Label>
+                <Label>Work Days</Label>
                 <div className="flex flex-wrap gap-2">
                   {daysOfWeek.map(day => (
                     <Button
@@ -253,18 +253,18 @@ export default function RobotDashboard() {
             </CardContent>
           </Card>
 
-          {/* Preferencias de Búsqueda */}
+          {/* Search Preferences */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center">
                 <MapPin className="mr-2 h-5 w-5" />
-                Preferencias de Búsqueda
+                Search Preferences
               </CardTitle>
-              <CardDescription>Estaciones y tipos de bloques preferidos</CardDescription>
+              <CardDescription>Preferred stations and block types</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label>Estaciones preferidas</Label>
+                <Label>Preferred Stations</Label>
                 <div className="grid grid-cols-2 gap-2">
                   {stations.map(station => (
                     <Button
@@ -281,22 +281,22 @@ export default function RobotDashboard() {
               </div>
               
               <div className="space-y-2">
-                <Label>Tipo de bloques</Label>
+                <Label>Block Types</Label>
                 <div className="flex flex-wrap gap-2">
                   <Button variant="outline" size="sm">
-                    Entrega rápida
+                    Instant Delivery
                   </Button>
                   <Button variant="outline" size="sm">
-                    Entrega programada
+                    Scheduled Delivery
                   </Button>
                   <Button variant="outline" size="sm">
-                    Logística
+                    Logistics
                   </Button>
                 </div>
               </div>
               
               <div className="space-y-2">
-                <Label>Tarifa mínima por hora</Label>
+                <Label>Minimum Rate per Hour</Label>
                 <div className="flex items-center gap-2">
                   <span className="text-sm">$</span>
                   <input
@@ -313,36 +313,36 @@ export default function RobotDashboard() {
           </Card>
         </div>
         
-        {/* Actividad Reciente */}
+        {/* Recent Activity */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center">
               <Calendar className="mr-2 h-5 w-5" />
-              Actividad Reciente
+              Recent Activity
             </CardTitle>
-            <CardDescription>Historial de bloques capturados</CardDescription>
+            <CardDescription>Block capture history</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="text-center py-8">
               <Package className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-              <h3 className="text-lg font-medium mb-2">Sin actividad reciente</h3>
+              <h3 className="text-lg font-medium mb-2">No recent activity</h3>
               <p className="text-muted-foreground">
-                Una vez que comiences a capturar bloques, aparecerán aquí.
+                Once you start capturing blocks, they will appear here.
               </p>
               <Button className="mt-4" onClick={handleStart} disabled={!isAutoSearchEnabled}>
                 <Play className="mr-2 h-4 w-4" />
-                Iniciar Búsqueda
+                Start Search
               </Button>
             </div>
           </CardContent>
         </Card>
         
-        {/* Notificaciones del Sistema */}
+        {/* System Notifications */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center">
               <Bell className="mr-2 h-5 w-5" />
-              Notificaciones del Sistema
+              System Notifications
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -351,9 +351,9 @@ export default function RobotDashboard() {
                 <Bell className="h-4 w-4 text-primary" />
               </div>
               <div>
-                <p className="font-medium">Sistema configurado correctamente</p>
+                <p className="font-medium">System configured successfully</p>
                 <p className="text-sm text-muted-foreground">
-                  Tu sistema está listo para comenzar a buscar bloques. Activa la búsqueda automática para empezar.
+                  Your system is ready to start searching for blocks. Enable auto search to begin.
                 </p>
               </div>
             </div>
