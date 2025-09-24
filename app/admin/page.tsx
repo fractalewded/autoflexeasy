@@ -92,7 +92,7 @@ export default async function AdminPage() {
         <UsersTable rows={recentUsers.map(u => ({
           email: u.email ?? '—',
           role: roleById.get(u.id) ?? 'user',
-          created_at: u.created_at ?? u.createdAt ?? null,
+          created_at: u.created_at ?? null, // CORREGIDO: Solo usa created_at
         }))} />
         <SubsTable rows={(subs ?? []).map(s => ({
           email: emails.get(s.user_id!) ?? s.user_id,
