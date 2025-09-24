@@ -1,18 +1,25 @@
-export const runtime = 'nodejs';
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/utils/supabase/server-admin';
 
-export async function POST(req: NextRequest) {
+export async function POST(req: Request) {
   try {
     const { email, redirectTo } = await req.json();
-    if (!email) return NextResponse.json({ error: 'Email requerido' }, { status: 400 });
+    if (!email) {
+      return NextResponse.json({ ok: false, error: 'Email requerido' }, { status: 400 });
+    }
 
     const supabase = createAdminClient();
-    const { data, error } = await supabase.auth.admin.inviteUserByEmail(email, { redirectTo });
-    if (error) throw error;
+    const { data, error } = await supabase.auth.admin.generateLink({
+      type: 'invite',
+      email,
+      options: { redirectTo },
+    });
 
-    return NextResponse.json({ ok: true, data });
+    if (error) {
+      return NextResponse.json({ ok: false, error: error.message }, { status: 400 });
+    }
+    return NextResponse.json({ ok: true, userId: data.user?.id ?? null });
   } catch (e: any) {
-    return NextResponse.json({ error: e?.message || 'Error' }, { status: 500 });
+    return NextResponse.json({ ok: false, error: e?.message ?? 'Error inesperado' }, { status: 500 });
   }
 }

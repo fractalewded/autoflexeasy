@@ -8,19 +8,42 @@ export default function AdminAuthActions() {
   const [msg, setMsg] = useState<string | null>(null);
   const [loading, setLoading] = useState<string | null>(null);
 
-  async function call(path: string) {
-    setMsg(null); setLoading(path);
+  // Parser robusto: intenta JSON; si falla, devuelve el texto crudo.
+  async function safeParse(res: Response) {
+    const text = await res.text();
     try {
+      return { data: text ? JSON.parse(text) : null, raw: text };
+    } catch {
+      return { data: null, raw: text };
+    }
+  }
+
+  async function call(path: string) {
+    setMsg(null);
+    setLoading(path);
+
+    try {
+      const body = { email: email.trim(), redirectTo: redirectTo.trim() };
+
       const res = await fetch(path, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, redirectTo }),
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(body),
       });
-      const json = await res.json();
-      if (!res.ok) throw new Error(json?.error || 'Error');
+
+      const { data, raw } = await safeParse(res);
+      // Log de depuración (Vas a verlo en la consola del navegador)
+      console.log('[AdminAuthActions]', { path, status: res.status, data, raw });
+
+      if (!res.ok) {
+        const serverMsg =
+          data?.error || data?.message || raw || res.statusText || 'Error desconocido';
+        throw new Error(serverMsg);
+      }
+
       setMsg('Hecho ✅');
     } catch (e: any) {
-      setMsg(`Error: ${e.message}`);
+      setMsg(`Error: ${e?.message || 'falló la solicitud'}`);
     } finally {
       setLoading(null);
     }
@@ -30,7 +53,7 @@ export default function AdminAuthActions() {
     <button
       onClick={() => call(path)}
       className="px-3 py-2 rounded-xl border border-neutral-300 hover:bg-neutral-50 dark:border-neutral-700 dark:hover:bg-neutral-800 disabled:opacity-50"
-      disabled={!email || !!loading}
+      disabled={!email.trim() || !!loading}
     >
       {loading === path ? 'Enviando…' : label}
     </button>
