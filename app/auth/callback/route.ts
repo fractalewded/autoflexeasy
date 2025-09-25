@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
   const code = url.searchParams.get('code');
 
   // Server-side Supabase client with cookie read/write
-  const supabase = createClient(cookies());
+  const supabase = createClient(());
 
   // 1) Magic link / recovery: exchange code -> session
   if (code) {
