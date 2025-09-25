@@ -3,11 +3,11 @@
 
 class DebugLogger {
   private logs: string[] = [];
-  private readonly maxLogs = 1000; // Máximo de logs en memoria
+  private readonly maxLogs = 1000;
 
   log(message: string, data?: any) {
     const timestamp = new Date().toISOString();
-    const logMessage = `[${timestamp}] ${message}${data ? ' | ' + JSON.stringify(data, null, 2) : ''}`;
+    const logMessage = `[${timestamp}] ${message}${data ? ' | ' + JSON.stringify(data) : ''}`;
     
     this.logs.push(logMessage);
     
@@ -16,10 +16,7 @@ class DebugLogger {
       this.logs = this.logs.slice(-this.maxLogs);
     }
     
-    // También mostrar en consola para debugging inmediato
     console.log(logMessage);
-    
-    // Guardar en localStorage como backup
     this.saveToStorage();
   }
 
@@ -27,11 +24,12 @@ class DebugLogger {
     try {
       localStorage.setItem('debug_logs', JSON.stringify(this.logs));
     } catch (error) {
-      console.warn('No se pudo guardar en localStorage:', error);
+      console.warn('No se pudo guardar en localStorage');
     }
   }
 
-  downloadLogs() {
+  // Método para crear archivo físico
+  createFile() {
     const logContent = this.logs.join('\n');
     const blob = new Blob([logContent], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
