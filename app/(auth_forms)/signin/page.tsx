@@ -1,9 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import { useRouter } from 'next/navigation';
 
 import { Card, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -14,62 +13,48 @@ import { Github, Chrome } from 'lucide-react';
 
 export default function SignIn() {
   const supabase = createClientComponentClient();
-  const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-
-  // ✅ MONITOREAR CAMBIOS DE AUTENTICACIÓN
-  useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        console.log('[auth] Auth state changed:', event);
-        
-        if (event === 'SIGNED_IN') {
-          console.log('[auth] User signed in, redirecting...');
-          // Esperar un momento para que las cookies se establezcan
-          setTimeout(() => {
-            router.refresh(); // Forzar refresh del router
-            router.push('/dashboard/account');
-          }, 100);
-        }
-      }
-    );
-
-    return () => subscription.unsubscribe();
-  }, [supabase, router]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setErrorMsg(null);
     setIsSubmitting(true);
-    console.log('[signin] submit fired');
 
     try {
       const fd = new FormData(e.currentTarget);
       const email = String(fd.get('email') || '').trim();
       const password = String(fd.get('password') || '');
 
-      console.log('[signin] email:', email);
+      console.log('🔹 [1] Iniciando login...');
 
-      // ✅ SOLO HACER LOGIN, LA REDIRECCIÓN LA MANEJA onAuthStateChange
-      const { error } = await supabase.auth.signInWithPassword({ 
+      const { data, error } = await supabase.auth.signInWithPassword({ 
         email, 
         password 
       });
       
+      console.log('🔹 [2] Respuesta de Supabase:', { data, error });
+
       if (error) {
-        console.error('[signin] supabase error:', error);
+        console.error('🔴 [3] Error de login:', error);
         setErrorMsg(error.message || 'Credenciales inválidas.');
         return;
       }
       
-      console.log('[signin] login successful, waiting for auth state change...');
-      // NO REDIRIGIR MANUALMENTE AQUÍ
+      console.log('🟢 [4] Login EXITOSO, usuario:', data.user);
+      console.log('🔹 [5] Intentando redirección...');
+
+      // ✅ OPCIÓN 1: Redirección forzada con delay
+      setTimeout(() => {
+        console.log('🔹 [6] Ejecutando redirección...');
+        window.location.href = '/dashboard/account';
+      }, 500);
       
     } catch (err: any) {
-      console.error('[signin] unexpected error:', err);
+      console.error('🔴 [7] Error inesperado:', err);
       setErrorMsg(err?.message || 'Error inesperado.');
     } finally {
+      console.log('🔹 [8] Finalizando submit...');
       setIsSubmitting(false);
     }
   };
