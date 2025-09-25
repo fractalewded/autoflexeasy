@@ -32,28 +32,20 @@ export default function SignIn() {
     setIsSubmitting(true);
 
     await logWithDelay('🔐 [SIGNIN] === INICIANDO PROCESO DE LOGIN ===');
+    await logWithDelay('📝 [SIGNIN] Formulario enviado', { isSubmitting: true });
 
     try {
       // ✅ CORRECCIÓN: Usar e.target en lugar de e.currentTarget
       const form = e.target as HTMLFormElement;
       const fd = new FormData(form);
-      
       const email = String(fd.get('email') || '').trim();
       const password = String(fd.get('password') || '');
 
-      await logWithDelay('📧 [SIGNIN] EMAIL OBTENIDO', { 
-        email: email ? '***' + email.slice(-10) : 'VACÍO' 
-      });
+      await logWithDelay('📧 [SIGNIN] Email obtenido', { email: email ? '***' + email.slice(-10) : 'VACÍO' });
+      await logWithDelay('🔒 [SIGNIN] Longitud de password', { length: password.length });
+      await logWithDelay('🌐 [SIGNIN] URL actual', { url: window.location.href });
 
-      await logWithDelay('🔒 [SIGNIN] PASSWORD OBTENIDO', { 
-        longitud: password.length 
-      });
-
-      await logWithDelay('🌐 [SIGNIN] URL ACTUAL', { 
-        url: window.location.href 
-      });
-
-      await logWithDelay('🔄 [SIGNIN] LLAMANDO A SUPABASE.AUTH.SIGNINWITHPASSWORD');
+      await logWithDelay('🔄 [SIGNIN] Llamando a supabase.auth.signInWithPassword');
       
       const startTime = Date.now();
       const { data, error } = await supabase.auth.signInWithPassword({ 
@@ -62,56 +54,51 @@ export default function SignIn() {
       });
       const endTime = Date.now();
       
-      await logWithDelay('⏱️ [SIGNIN] TIEMPO DE RESPUESTA', { 
-        tiempo: endTime - startTime + 'ms' 
-      });
-
-      await logWithDelay('📨 [SIGNIN] RESPUESTA DE SUPABASE', { 
-        error: error ? error.message : 'NO HAY ERROR',
-        data: data ? 'PRESENTE' : 'AUSENTE' 
+      await logWithDelay('⏱️ [SIGNIN] Tiempo de respuesta Supabase', { tiempo: endTime - startTime + 'ms' });
+      await logWithDelay('📨 [SIGNIN] Respuesta de Supabase', { 
+        error: error ? { message: error.message, status: error.status } : null,
+        dataPresente: !!data 
       });
       
       if (error) {
         await logWithDelay('❌ [SIGNIN] ERROR DE AUTENTICACIÓN', {
-          mensaje: error.message,
-          status: error.status
+          message: error.message,
+          status: error.status,
+          name: error.name
         });
         setErrorMsg(error.message || 'Credenciales inválidas.');
         return;
       }
       
       await logWithDelay('✅ [SIGNIN] LOGIN EXITOSO');
-      await logWithDelay('👤 [SIGNIN] DATOS DE USUARIO', {
+      await logWithDelay('👤 [SIGNIN] Datos de usuario', {
         id: data.user?.id,
         email: data.user?.email,
-        sesionCreada: !!data.session
+        sesionCreada: !!data.session,
+        rol: data.user?.role
       });
 
       // Debug de almacenamiento
-      await logWithDelay('💾 [SIGNIN] VERIFICANDO LOCALSTORAGE');
+      await logWithDelay('💾 [SIGNIN] Verificando localStorage');
       try {
         const supabaseToken = localStorage.getItem('supabase.auth.token');
-        await logWithDelay('🔐 [SIGNIN] TOKEN EN LOCALSTORAGE', { 
-          tokenPresente: !!supabaseToken 
-        });
+        await logWithDelay('🔐 [SIGNIN] Token en localStorage', { tokenPresente: !!supabaseToken });
       } catch (storageError) {
-        await logWithDelay('⚠️ [SIGNIN] ERROR ACCEDIENDO LOCALSTORAGE');
+        await logWithDelay('⚠️ [SIGNIN] Error accediendo localStorage', { error: storageError });
       }
 
-      await logWithDelay('🔄 [SIGNIN] VERIFICANDO SESIÓN PERSISTIDA');
+      await logWithDelay('🔄 [SIGNIN] Verificando sesión persistida');
       const { data: sessionCheck, error: sessionError } = await supabase.auth.getSession();
-      await logWithDelay('🔍 [SIGNIN] SESIÓN DESPUÉS DE LOGIN', {
+      await logWithDelay('🔍 [SIGNIN] Sesión después de login', {
         error: sessionError,
         sesionPresente: !!sessionCheck.session
       });
 
-      await logWithDelay('⏳ [SIGNIN] ESPERANDO 2 SEGUNDOS PARA SINCRONIZACIÓN');
+      await logWithDelay('⏳ [SIGNIN] Esperando 2 segundos para sincronización');
       await new Promise(resolve => setTimeout(resolve, 2000));
 
-      await logWithDelay('🧭 [SIGNIN] REDIRIGIENDO A /DASHBOARD');
-      await logWithDelay('📍 [SIGNIN] URL DESTINO', { 
-        destino: window.location.origin + '/dashboard' 
-      });
+      await logWithDelay('🧭 [SIGNIN] REDIRIGIENDO A /dashboard');
+      await logWithDelay('📍 [SIGNIN] URL destino', { destino: window.location.origin + '/dashboard' });
       
       window.location.href = '/dashboard';
       
@@ -126,11 +113,12 @@ export default function SignIn() {
       
     } catch (err: any) {
       await logWithDelay('💥 [SIGNIN] ERROR INESPERADO', {
-        mensaje: err.message
+        message: err.message,
+        name: err.name
       });
       setErrorMsg(err?.message || 'Error inesperado.');
     } finally {
-      await logWithDelay('🏁 [SIGNIN] FINALIZANDO PROCESO DE LOGIN');
+      await logWithDelay('🏁 [SIGNIN] Finalizando proceso de login');
       setIsSubmitting(false);
     }
   };
