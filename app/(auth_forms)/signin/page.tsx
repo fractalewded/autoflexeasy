@@ -38,7 +38,7 @@ export default function SignIn() {
         return;
       }
       console.log('[signin] success, redirecting to /auth/callback');
-      router.replace('/auth/callback'); // ← redirección SIEMPRE
+      router.push('/auth/callback'); // ← redirección SIEMPRE
     } catch (err: any) {
       console.error('[signin] unexpected error:', err);
       setErrorMsg(err?.message || 'Error inesperado.');
