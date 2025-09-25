@@ -18,53 +18,56 @@ export default function SignIn() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  // Password sign-in → ALWAYS go to /auth/callback (server decides final destination)
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+    e.preventDefault(); // ← asegura que no recargue la página
     setErrorMsg(null);
     setIsSubmitting(true);
+    console.log('[signin] submit fired');
+
     try {
       const fd = new FormData(e.currentTarget);
       const email = String(fd.get('email') || '').trim();
       const password = String(fd.get('password') || '');
 
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      console.log('[signin] email:', email ? '(present)' : '(missing)');
+
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
-        setErrorMsg(error.message || 'Invalid credentials.');
+        console.error('[signin] supabase error:', error.message);
+        setErrorMsg(error.message || 'Credenciales inválidas.');
         return;
       }
-      router.replace('/auth/callback');
+      console.log('[signin] success, redirecting to /auth/callback');
+      router.replace('/auth/callback'); // ← redirección SIEMPRE
     } catch (err: any) {
-      setErrorMsg(err?.message || 'Unexpected error.');
+      console.error('[signin] unexpected error:', err);
+      setErrorMsg(err?.message || 'Error inesperado.');
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // OAuth sign-in → Supabase handles redirect → back to /auth/callback
   const handleOAuth = async (provider: 'github' | 'google') => {
     setErrorMsg(null);
     setIsSubmitting(true);
+    console.log('[signin] oauth start:', provider);
     try {
       const { error } = await supabase.auth.signInWithOAuth({
         provider,
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-        },
+        options: { redirectTo: `${window.location.origin}/auth/callback` },
       });
-      if (error) setErrorMsg(error.message);
-      // Supabase will redirect; no manual router call here
+      if (error) {
+        console.error('[signin] oauth error:', error.message);
+        setErrorMsg(error.message);
+      }
+      // Supabase hace la redirección automáticamente
     } catch (err: any) {
-      setErrorMsg(err?.message || 'Unexpected error.');
+      console.error('[signin] oauth unexpected error:', err);
+      setErrorMsg(err?.message || 'Error inesperado.');
     } finally {
       setIsSubmitting(false);
     }
   };
-
-  const oAuthProviders = [
-    { name: 'github' as const, displayName: 'GitHub', icon: <Github className="mr-2 h-4 w-4" /> },
-    { name: 'google' as const, displayName: 'Google', icon: <Chrome className="mr-2 h-4 w-4" /> },
-  ];
 
   return (
     <div className="flex min-h-[100dvh] flex-col bg-background px-4 py-12 sm:px-6 lg:px-8">
@@ -116,27 +119,19 @@ export default function SignIn() {
                   required
                 />
               </div>
-              <Button type="submit" className="w-full" loading={isSubmitting}>
+              <Button type="submit" className="w-full" loading={isSubmitting} disabled={isSubmitting}>
                 Sign in
               </Button>
             </form>
 
             <div className="flex justify-center">
-              <Link
-                href="/signup"
-                className="text-sm font-medium hover:underline underline-offset-4"
-                prefetch={false}
-              >
+              <Link href="/signup" className="text-sm font-medium hover:underline underline-offset-4" prefetch={false}>
                 Don&apos;t have an account? Sign up
               </Link>
             </div>
 
             <div className="flex justify-center">
-              <Link
-                href="/forgot_password"
-                className="text-sm font-bold hover:underline underline-offset-4"
-                prefetch={false}
-              >
+              <Link href="/forgot_password" className="text-sm font-bold hover:underline underline-offset-4" prefetch={false}>
                 Forgot your password?
               </Link>
             </div>
@@ -144,17 +139,22 @@ export default function SignIn() {
             <Separator className="my-6" />
 
             <div className="grid gap-2">
-              {oAuthProviders.map((provider) => (
-                <button
-                  key={provider.name}
-                  onClick={() => handleOAuth(provider.name)}
-                  className="inline-flex items-center justify-center rounded-md border px-3 py-2 text-sm w-full disabled:opacity-50"
-                  disabled={isSubmitting /* or disable Google if not configured */}
-                >
-                  {provider.icon}
-                  Sign in with {provider.displayName}
-                </button>
-              ))}
+              <button
+                onClick={() => handleOAuth('github')}
+                className="inline-flex items-center justify-center rounded-md border px-3 py-2 text-sm w-full disabled:opacity-50"
+                disabled={isSubmitting}
+              >
+                <Github className="mr-2 h-4 w-4" />
+                Sign in with GitHub
+              </button>
+              <button
+                onClick={() => handleOAuth('google')}
+                className="inline-flex items-center justify-center rounded-md border px-3 py-2 text-sm w-full disabled:opacity-50"
+                disabled={isSubmitting /* desactiva si no configuraste Google */}
+              >
+                <Chrome className="mr-2 h-4 w-4" />
+                Sign in with Google
+              </button>
             </div>
           </CardContent>
         </Card>
@@ -165,18 +165,8 @@ export default function SignIn() {
 
 function ArrowLeftIcon(props: any) {
   return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
+    <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+         fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <path d="m12 19-7-7 7-7" />
       <path d="M19 12H5" />
     </svg>
