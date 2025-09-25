@@ -1,75 +1,70 @@
-// middleware.ts
+// middleware.ts - CON ESPERAS DE 4 SEGUNDOS
 import { type NextRequest, NextResponse } from 'next/server';
 import { updateSession } from '@/utils/supabase/middleware';
 
-// Función para enviar logs a una API
-async function sendLogToAPI(message: string, data?: any) {
-  try {
-    const timestamp = new Date().toISOString();
-    const logData = {
-      timestamp,
-      message,
-      data: data || null,
-      path: process.env.NODE_ENV,
-      type: 'middleware'
-    };
-
-    // Enviar a una API route que guarde en base de datos o retorne los logs
-    await fetch('/api/debug-logs', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(logData),
-    });
-  } catch (error) {
-    console.error('Error enviando log a API:', error);
-  }
+// Función con espera para ver mensajes en consola
+function logWithDelay(message: string, data?: any, delay = 4000) {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      console.log(`[${new Date().toISOString()}] ${message}`, data || '');
+      resolve(null);
+    }, delay);
+  });
 }
 
 export async function middleware(request: NextRequest) {
-  const logData = {
+  await logWithDelay('🚀 [MIDDLEWARE] INICIANDO MIDDLEWARE', {
     ruta: request.nextUrl.pathname,
     metodo: request.method,
-    url: request.url,
-    userAgent: request.headers.get('user-agent')?.slice(0, 100),
-    ip: request.ip || request.headers.get('x-forwarded-for')
-  };
-
-  console.log('🚀 [MIDDLEWARE] Iniciando:', logData);
-  await sendLogToAPI('🚀 [MIDDLEWARE] Iniciando', logData);
+    url: request.url
+  });
 
   try {
+    // 1. Debug de rutas públicas
     const publicPaths = ['/signin', '/signup', '/auth', '/forgot_password'];
     const isPublicPath = publicPaths.some(path => request.nextUrl.pathname.startsWith(path));
     
-    console.log('🔍 [MIDDLEWARE] Es ruta pública?:', isPublicPath);
-    await sendLogToAPI('🔍 [MIDDLEWARE] Es ruta pública?', { isPublicPath, ruta: request.nextUrl.pathname });
+    await logWithDelay('🔍 [MIDDLEWARE] ANALIZANDO RUTA', {
+      esRutaPublica: isPublicPath,
+      rutaSolicitada: request.nextUrl.pathname,
+      rutasPublicas: publicPaths
+    });
 
     if (isPublicPath) {
-      console.log('✅ [MIDDLEWARE] Ruta pública, permitiendo acceso');
+      await logWithDelay('✅ [MIDDLEWARE] RUTA PÚBLICA - ACCESO PERMITIDO');
       const response = NextResponse.next();
+      await logWithDelay('📤 [MIDDLEWARE] RETORNANDO RESPUESTA');
       return response;
     }
 
-    console.log('🔄 [MIDDLEWARE] Llamando a updateSession...');
-    const response = await updateSession(request);
-    console.log('✅ [MIDDLEWARE] updateSession completado');
-    
-    console.log('📨 [MIDDLEWARE] Headers de response:', Object.fromEntries(response.headers));
-    await sendLogToAPI('📨 [MIDDLEWARE] Headers de response', {
-      headers: Object.fromEntries(response.headers),
-      location: response.headers.get('location')
+    // 2. Debug de cookies
+    const cookies = request.cookies.getAll();
+    await logWithDelay('🍪 [MIDDLEWARE] COOKIES DE REQUEST', {
+      totalCookies: cookies.length,
+      cookiesSupabase: cookies.filter(c => c.name.includes('supabase') || c.name.includes('sb-')).map(c => c.name)
     });
-    
+
+    // 3. Llamar a updateSession
+    await logWithDelay('🔄 [MIDDLEWARE] LLAMANDO A updateSession...');
+    const response = await updateSession(request);
+    await logWithDelay('✅ [MIDDLEWARE] updateSession COMPLETADO');
+
+    // 4. Debug de respuesta
+    await logWithDelay('📨 [MIDDLEWARE] HEADERS DE RESPUESTA', {
+      location: response.headers.get('location'),
+      status: response.status,
+      tieneRedireccion: !!response.headers.get('location')
+    });
+
+    await logWithDelay('🏁 [MIDDLEWARE] FINALIZADO EXITOSAMENTE');
     return response;
 
   } catch (error) {
-    console.error('❌ [MIDDLEWARE] Error crítico:', error);
-    await sendLogToAPI('❌ [MIDDLEWARE] Error crítico', { error: error instanceof Error ? error.message : error });
+    await logWithDelay('❌ [MIDDLEWARE] ERROR CRÍTICO', {
+      error: error instanceof Error ? error.message : error
+    });
     
     const errorResponse = NextResponse.next();
-    errorResponse.headers.set('x-middleware-error', 'true');
     return errorResponse;
   }
 }
@@ -78,7 +73,7 @@ export const config = {
   matcher: [
     '/dashboard/:path*',
     '/admin/:path*',
-    '/signin',
+    '/signin', 
     '/signup'
   ]
 };

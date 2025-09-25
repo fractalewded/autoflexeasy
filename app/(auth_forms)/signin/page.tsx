@@ -3,38 +3,54 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import { logger } from '@/utils/logger';
 
 import { Card, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { Github, Chrome, Download, Trash2 } from 'lucide-react';
+import { Github, Chrome } from 'lucide-react';
 
 export default function SignIn() {
   const supabase = createClientComponentClient();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
+  // Función con espera de 4 segundos entre mensajes
+  const logWithDelay = (message: string, data?: any, delay = 4000) => {
+    return new Promise(resolve => {
+      setTimeout(() => {
+        console.log(`[${new Date().toISOString()}] ${message}`, data || '');
+        resolve(null);
+      }, delay);
+    });
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setErrorMsg(null);
     setIsSubmitting(true);
 
-    logger.log('🔐 === INICIANDO PROCESO DE LOGIN ===');
-    logger.log('📝 Formulario enviado', { isSubmitting: true });
+    await logWithDelay('🔐 [SIGNIN] === INICIANDO PROCESO DE LOGIN ===');
 
     try {
       const fd = new FormData(e.currentTarget);
       const email = String(fd.get('email') || '').trim();
       const password = String(fd.get('password') || '');
 
-      logger.log('📧 Email obtenido', { email: email ? '***' + email.slice(-10) : 'VACÍO' });
-      logger.log('🔒 Longitud de password', { length: password.length });
-      logger.log('🌐 URL actual', { url: window.location.href });
+      await logWithDelay('📧 [SIGNIN] EMAIL OBTENIDO', { 
+        email: email ? '***' + email.slice(-10) : 'VACÍO' 
+      });
 
-      logger.log('🔄 Llamando a supabase.auth.signInWithPassword');
+      await logWithDelay('🔒 [SIGNIN] PASSWORD OBTENIDO', { 
+        longitud: password.length 
+      });
+
+      await logWithDelay('🌐 [SIGNIN] URL ACTUAL', { 
+        url: window.location.href 
+      });
+
+      await logWithDelay('🔄 [SIGNIN] LLAMANDO A SUPABASE.AUTH.SIGNINWITHPASSWORD');
       
       const startTime = Date.now();
       const { data, error } = await supabase.auth.signInWithPassword({ 
@@ -43,87 +59,81 @@ export default function SignIn() {
       });
       const endTime = Date.now();
       
-      logger.log('⏱️ Tiempo de respuesta Supabase', { tiempo: endTime - startTime + 'ms' });
-      logger.log('📨 Respuesta de Supabase', { 
-        error: error ? { message: error.message, status: error.status } : null,
-        dataPresente: !!data 
+      await logWithDelay('⏱️ [SIGNIN] TIEMPO DE RESPUESTA', { 
+        tiempo: endTime - startTime + 'ms' 
+      });
+
+      await logWithDelay('📨 [SIGNIN] RESPUESTA DE SUPABASE', { 
+        error: error ? error.message : 'NO HAY ERROR',
+        data: data ? 'PRESENTE' : 'AUSENTE' 
       });
       
       if (error) {
-        logger.log('❌ ERROR DE AUTENTICACIÓN', {
-          message: error.message,
-          status: error.status,
-          name: error.name
+        await logWithDelay('❌ [SIGNIN] ERROR DE AUTENTICACIÓN', {
+          mensaje: error.message,
+          status: error.status
         });
         setErrorMsg(error.message || 'Credenciales inválidas.');
         return;
       }
       
-      logger.log('✅ LOGIN EXITOSO');
-      logger.log('👤 Datos de usuario', {
+      await logWithDelay('✅ [SIGNIN] LOGIN EXITOSO');
+      await logWithDelay('👤 [SIGNIN] DATOS DE USUARIO', {
         id: data.user?.id,
         email: data.user?.email,
-        sesionCreada: !!data.session,
-        rol: data.user?.role
+        sesionCreada: !!data.session
       });
 
       // Debug de almacenamiento
-      logger.log('💾 Verificando localStorage');
+      await logWithDelay('💾 [SIGNIN] VERIFICANDO LOCALSTORAGE');
       try {
         const supabaseToken = localStorage.getItem('supabase.auth.token');
-        logger.log('🔐 Token en localStorage', { tokenPresente: !!supabaseToken });
+        await logWithDelay('🔐 [SIGNIN] TOKEN EN LOCALSTORAGE', { 
+          tokenPresente: !!supabaseToken 
+        });
       } catch (storageError) {
-        logger.log('⚠️ Error accediendo localStorage', { error: storageError });
+        await logWithDelay('⚠️ [SIGNIN] ERROR ACCEDIENDO LOCALSTORAGE');
       }
 
-      logger.log('🔄 Verificando sesión persistida');
+      await logWithDelay('🔄 [SIGNIN] VERIFICANDO SESIÓN PERSISTIDA');
       const { data: sessionCheck, error: sessionError } = await supabase.auth.getSession();
-      logger.log('🔍 Sesión después de login', {
+      await logWithDelay('🔍 [SIGNIN] SESIÓN DESPUÉS DE LOGIN', {
         error: sessionError,
         sesionPresente: !!sessionCheck.session
       });
 
-      logger.log('⏳ Esperando 2 segundos para sincronización');
+      await logWithDelay('⏳ [SIGNIN] ESPERANDO 2 SEGUNDOS PARA SINCRONIZACIÓN');
       await new Promise(resolve => setTimeout(resolve, 2000));
 
-      logger.log('🧭 REDIRIGIENDO A /dashboard');
-      logger.log('📍 URL destino', { destino: window.location.origin + '/dashboard' });
+      await logWithDelay('🧭 [SIGNIN] REDIRIGIENDO A /DASHBOARD');
+      await logWithDelay('📍 [SIGNIN] URL DESTINO', { 
+        destino: window.location.origin + '/dashboard' 
+      });
       
       window.location.href = '/dashboard';
       
       // Fallback después de 5 segundos
       setTimeout(() => {
         if (window.location.pathname === '/signin') {
-          logger.log('⚠️ FALLBACK ACTIVADO: Redirección anterior falló');
-          logger.log('🔀 Intentando con window.location.replace');
+          console.log('⚠️ [SIGNIN] FALLBACK ACTIVADO: Redirección anterior falló');
+          console.log('🔀 [SIGNIN] Intentando con window.location.replace');
           window.location.replace('/dashboard');
         }
       }, 5000);
       
     } catch (err: any) {
-      logger.log('💥 ERROR INESPERADO', {
-        message: err.message,
-        name: err.name
+      await logWithDelay('💥 [SIGNIN] ERROR INESPERADO', {
+        mensaje: err.message
       });
       setErrorMsg(err?.message || 'Error inesperado.');
     } finally {
-      logger.log('🏁 Finalizando proceso de login');
+      await logWithDelay('🏁 [SIGNIN] FINALIZANDO PROCESO DE LOGIN');
       setIsSubmitting(false);
     }
   };
 
-  const handleDownloadLogs = () => {
-    logger.downloadLogs();
-  };
-
-  const handleClearLogs = () => {
-    logger.clearLogs();
-    setErrorMsg('Logs limpiados correctamente');
-    setTimeout(() => setErrorMsg(null), 3000);
-  };
-
   const handleOAuth = async (provider: 'github' | 'google') => {
-    logger.log('🔗 Iniciando OAuth', { provider });
+    console.log('🔗 [SIGNIN] Iniciando OAuth con:', provider);
     setErrorMsg(null);
     setIsSubmitting(true);
     
@@ -135,13 +145,11 @@ export default function SignIn() {
         },
       });
       if (error) {
-        logger.log('❌ Error OAuth', { error: error.message });
+        console.error('❌ [SIGNIN] Error OAuth:', error);
         setErrorMsg(error.message);
-      } else {
-        logger.log('✅ OAuth iniciado correctamente');
       }
     } catch (err: any) {
-      logger.log('💥 Error inesperado OAuth', { error: err.message });
+      console.error('💥 [SIGNIN] Error inesperado OAuth:', err);
       setErrorMsg(err?.message || 'Error inesperado.');
     } finally {
       setIsSubmitting(false);
@@ -155,26 +163,7 @@ export default function SignIn() {
           <ArrowLeftIcon className="h-5 w-5" />
           <span className="sr-only">Back</span>
         </Link>
-        
-        {/* Botones de debug */}
-        <div className="flex gap-2">
-          <button
-            onClick={handleDownloadLogs}
-            className="flex items-center gap-2 px-3 py-2 text-sm bg-blue-500 text-white rounded-md hover:bg-blue-600"
-            title="Descargar logs de debug"
-          >
-            <Download className="h-4 w-4" />
-            Descargar Logs
-          </button>
-          <button
-            onClick={handleClearLogs}
-            className="flex items-center gap-2 px-3 py-2 text-sm bg-red-500 text-white rounded-md hover:bg-red-600"
-            title="Limpiar logs"
-          >
-            <Trash2 className="h-4 w-4" />
-            Limpiar
-          </button>
-        </div>
+        <div />
       </div>
 
       <div className="flex items-center justify-center flex-1">
