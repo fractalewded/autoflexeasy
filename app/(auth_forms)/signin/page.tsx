@@ -34,7 +34,10 @@ export default function SignIn() {
     await logWithDelay('🔐 [SIGNIN] === INICIANDO PROCESO DE LOGIN ===');
 
     try {
-      const fd = new FormData(e.currentTarget);
+      // ✅ CORRECCIÓN: Usar e.target en lugar de e.currentTarget
+      const form = e.target as HTMLFormElement;
+      const fd = new FormData(form);
+      
       const email = String(fd.get('email') || '').trim();
       const password = String(fd.get('password') || '');
 
