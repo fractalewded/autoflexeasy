@@ -40,10 +40,10 @@ export default function SignIn() {
         return;
       }
       
-      console.log('[signin] success, redirecting to /auth/callback');
+      console.log('[signin] success, redirecting to dashboard');
       
-      // ✅ SOLUCIÓN CONFIRMADA - Redirección directa
-      window.location.href = '/auth/callback';
+      // ✅ CORRECCIÓN: Redirección DIRECTA al dashboard (NO a /auth/callback)
+      window.location.href = '/dashboard/account';
       
     } catch (err: any) {
       console.error('[signin] unexpected error:', err);
