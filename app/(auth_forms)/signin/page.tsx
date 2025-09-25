@@ -44,11 +44,11 @@ export default function SignIn() {
       console.log('🟢 [4] Login EXITOSO, usuario:', data.user);
       console.log('🔹 [5] Intentando redirección...');
 
-      // ✅ OPCIÓN 1: Redirección forzada con delay
+      // ✅ CORREGIDO: Redirección a la ruta correcta
       setTimeout(() => {
         console.log('🔹 [6] Ejecutando redirección...');
-        window.location.href = '/dashboard/account';
-      }, 500);
+        window.location.href = '/dashboard';  // ← CAMBIO AQUÍ
+      }, 1000);
       
     } catch (err: any) {
       console.error('🔴 [7] Error inesperado:', err);
