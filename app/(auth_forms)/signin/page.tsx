@@ -97,19 +97,30 @@ export default function SignIn() {
       await logWithDelay('⏳ [SIGNIN] Esperando 2 segundos para sincronización');
       await new Promise(resolve => setTimeout(resolve, 2000));
 
-      await logWithDelay('🧭 [SIGNIN] REDIRIGIENDO A /dashboard');
-      await logWithDelay('📍 [SIGNIN] URL destino', { destino: window.location.origin + '/dashboard' });
+      await logWithDelay('🧭 [SIGNIN] VERIFICANDO TOKEN ANTES DE REDIRIGIR');
       
-      window.location.href = '/dashboard';
+      // ✅ SOLUCIÓN: Verificar token antes de redirigir
+      setTimeout(() => {
+        const token = localStorage.getItem('supabase.auth.token');
+        console.log('🔑 [SIGNIN] Token final en localStorage:', token ? 'PRESENTE' : 'AUSENTE');
+        
+        if (!token) {
+          console.log('⚠️ [SIGNIN] Token ausente - Forzando recarga de página');
+          window.location.reload();
+        } else {
+          console.log('✅ [SIGNIN] Token presente - Redirigiendo a dashboard');
+          window.location.href = '/dashboard';
+        }
+      }, 1000);
       
-      // Fallback después de 5 segundos
+      // Fallback después de 8 segundos
       setTimeout(() => {
         if (window.location.pathname === '/signin') {
           console.log('⚠️ [SIGNIN] FALLBACK ACTIVADO: Redirección anterior falló');
-          console.log('🔀 [SIGNIN] Intentando con window.location.replace');
-          window.location.replace('/dashboard');
+          console.log('🔀 [SIGNIN] Intentando recarga completa');
+          window.location.href = window.location.origin + '?refresh=' + Date.now();
         }
-      }, 5000);
+      }, 8000);
       
     } catch (err: any) {
       await logWithDelay('💥 [SIGNIN] ERROR INESPERADO', {
