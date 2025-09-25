@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 
 import { Card, CardContent } from '@/components/ui/card';
@@ -13,13 +12,12 @@ import { Separator } from '@/components/ui/separator';
 import { Github, Chrome } from 'lucide-react';
 
 export default function SignIn() {
-  const router = useRouter();
   const supabase = createClientComponentClient();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault(); // ← asegura que no recargue la página
+    e.preventDefault();
     setErrorMsg(null);
     setIsSubmitting(true);
     console.log('[signin] submit fired');
@@ -31,14 +29,22 @@ export default function SignIn() {
 
       console.log('[signin] email:', email ? '(present)' : '(missing)');
 
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      const { data, error } = await supabase.auth.signInWithPassword({ 
+        email, 
+        password 
+      });
+      
       if (error) {
         console.error('[signin] supabase error:', error.message);
         setErrorMsg(error.message || 'Credenciales inválidas.');
         return;
       }
+      
       console.log('[signin] success, redirecting to /auth/callback');
-      router.push('/auth/callback'); // ← redirección SIEMPRE
+      
+      // ✅ SOLUCIÓN CONFIRMADA - Redirección directa
+      window.location.href = '/auth/callback';
+      
     } catch (err: any) {
       console.error('[signin] unexpected error:', err);
       setErrorMsg(err?.message || 'Error inesperado.');
@@ -54,13 +60,15 @@ export default function SignIn() {
     try {
       const { error } = await supabase.auth.signInWithOAuth({
         provider,
-        options: { redirectTo: `${window.location.origin}/auth/callback` },
+        options: { 
+          redirectTo: `${window.location.origin}/auth/callback` 
+        },
       });
       if (error) {
         console.error('[signin] oauth error:', error.message);
         setErrorMsg(error.message);
       }
-      // Supabase hace la redirección automáticamente
+      // Supabase hace la redirección automáticamente para OAuth
     } catch (err: any) {
       console.error('[signin] oauth unexpected error:', err);
       setErrorMsg(err?.message || 'Error inesperado.');
@@ -150,7 +158,7 @@ export default function SignIn() {
               <button
                 onClick={() => handleOAuth('google')}
                 className="inline-flex items-center justify-center rounded-md border px-3 py-2 text-sm w-full disabled:opacity-50"
-                disabled={isSubmitting /* desactiva si no configuraste Google */}
+                disabled={isSubmitting}
               >
                 <Chrome className="mr-2 h-4 w-4" />
                 Sign in with Google
