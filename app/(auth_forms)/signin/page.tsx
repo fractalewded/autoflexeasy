@@ -1,8 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { useRouter } from 'next/navigation';
 
 import { Card, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -13,8 +14,29 @@ import { Github, Chrome } from 'lucide-react';
 
 export default function SignIn() {
   const supabase = createClientComponentClient();
+  const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  // ✅ MONITOREAR CAMBIOS DE AUTENTICACIÓN
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        console.log('[auth] Auth state changed:', event);
+        
+        if (event === 'SIGNED_IN') {
+          console.log('[auth] User signed in, redirecting...');
+          // Esperar un momento para que las cookies se establezcan
+          setTimeout(() => {
+            router.refresh(); // Forzar refresh del router
+            router.push('/dashboard/account');
+          }, 100);
+        }
+      }
+    );
+
+    return () => subscription.unsubscribe();
+  }, [supabase, router]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -27,23 +49,22 @@ export default function SignIn() {
       const email = String(fd.get('email') || '').trim();
       const password = String(fd.get('password') || '');
 
-      console.log('[signin] email:', email ? '(present)' : '(missing)');
+      console.log('[signin] email:', email);
 
-      const { data, error } = await supabase.auth.signInWithPassword({ 
+      // ✅ SOLO HACER LOGIN, LA REDIRECCIÓN LA MANEJA onAuthStateChange
+      const { error } = await supabase.auth.signInWithPassword({ 
         email, 
         password 
       });
       
       if (error) {
-        console.error('[signin] supabase error:', error.message);
+        console.error('[signin] supabase error:', error);
         setErrorMsg(error.message || 'Credenciales inválidas.');
         return;
       }
       
-      console.log('[signin] success, redirecting to dashboard');
-      
-      // ✅ CORRECCIÓN: Redirección DIRECTA al dashboard (NO a /auth/callback)
-      window.location.href = '/dashboard/account';
+      console.log('[signin] login successful, waiting for auth state change...');
+      // NO REDIRIGIR MANUALMENTE AQUÍ
       
     } catch (err: any) {
       console.error('[signin] unexpected error:', err);
@@ -56,7 +77,7 @@ export default function SignIn() {
   const handleOAuth = async (provider: 'github' | 'google') => {
     setErrorMsg(null);
     setIsSubmitting(true);
-    console.log('[signin] oauth start:', provider);
+    
     try {
       const { error } = await supabase.auth.signInWithOAuth({
         provider,
@@ -65,12 +86,9 @@ export default function SignIn() {
         },
       });
       if (error) {
-        console.error('[signin] oauth error:', error.message);
         setErrorMsg(error.message);
       }
-      // Supabase hace la redirección automáticamente para OAuth
     } catch (err: any) {
-      console.error('[signin] oauth unexpected error:', err);
       setErrorMsg(err?.message || 'Error inesperado.');
     } finally {
       setIsSubmitting(false);
