@@ -3,19 +3,18 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-import { createClient } from '@/utils/supabase/server';
+import { createClient } from '@/utils/supabase/server'; // ✅ Elimina la importación de 'cookies'
 
 const ADMIN_PANEL_PATH = '/admin';
-const USER_PANEL_PATH = '/dashboard/account'; // change if your user panel is different
+const USER_PANEL_PATH = '/dashboard/account';
 
 export async function GET(request: NextRequest) {
   const url = new URL(request.url);
   const origin = url.origin;
   const code = url.searchParams.get('code');
 
-  // Server-side Supabase client with cookie read/write
-  const supabase = createClient(());
+  // ✅ CORRECTO: createClient() sin parámetros
+  const supabase = createClient();
 
   // 1) Magic link / recovery: exchange code -> session
   if (code) {
