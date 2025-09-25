@@ -3,13 +3,14 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { logger } from '@/utils/logger';
 
 import { Card, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { Github, Chrome } from 'lucide-react';
+import { Github, Chrome, Download, Trash2 } from 'lucide-react';
 
 export default function SignIn() {
   const supabase = createClientComponentClient();
@@ -21,45 +22,108 @@ export default function SignIn() {
     setErrorMsg(null);
     setIsSubmitting(true);
 
+    logger.log('🔐 === INICIANDO PROCESO DE LOGIN ===');
+    logger.log('📝 Formulario enviado', { isSubmitting: true });
+
     try {
       const fd = new FormData(e.currentTarget);
       const email = String(fd.get('email') || '').trim();
       const password = String(fd.get('password') || '');
 
-      console.log('🔹 [1] Iniciando login...');
+      logger.log('📧 Email obtenido', { email: email ? '***' + email.slice(-10) : 'VACÍO' });
+      logger.log('🔒 Longitud de password', { length: password.length });
+      logger.log('🌐 URL actual', { url: window.location.href });
 
+      logger.log('🔄 Llamando a supabase.auth.signInWithPassword');
+      
+      const startTime = Date.now();
       const { data, error } = await supabase.auth.signInWithPassword({ 
         email, 
         password 
       });
+      const endTime = Date.now();
       
-      console.log('🔹 [2] Respuesta de Supabase:', { data, error });
-
+      logger.log('⏱️ Tiempo de respuesta Supabase', { tiempo: endTime - startTime + 'ms' });
+      logger.log('📨 Respuesta de Supabase', { 
+        error: error ? { message: error.message, status: error.status } : null,
+        dataPresente: !!data 
+      });
+      
       if (error) {
-        console.error('🔴 [3] Error de login:', error);
+        logger.log('❌ ERROR DE AUTENTICACIÓN', {
+          message: error.message,
+          status: error.status,
+          name: error.name
+        });
         setErrorMsg(error.message || 'Credenciales inválidas.');
         return;
       }
       
-      console.log('🟢 [4] Login EXITOSO, usuario:', data.user);
-      console.log('🔹 [5] Intentando redirección...');
+      logger.log('✅ LOGIN EXITOSO');
+      logger.log('👤 Datos de usuario', {
+        id: data.user?.id,
+        email: data.user?.email,
+        sesionCreada: !!data.session,
+        rol: data.user?.role
+      });
 
-      // ✅ CORREGIDO: Redirección a la ruta correcta
+      // Debug de almacenamiento
+      logger.log('💾 Verificando localStorage');
+      try {
+        const supabaseToken = localStorage.getItem('supabase.auth.token');
+        logger.log('🔐 Token en localStorage', { tokenPresente: !!supabaseToken });
+      } catch (storageError) {
+        logger.log('⚠️ Error accediendo localStorage', { error: storageError });
+      }
+
+      logger.log('🔄 Verificando sesión persistida');
+      const { data: sessionCheck, error: sessionError } = await supabase.auth.getSession();
+      logger.log('🔍 Sesión después de login', {
+        error: sessionError,
+        sesionPresente: !!sessionCheck.session
+      });
+
+      logger.log('⏳ Esperando 2 segundos para sincronización');
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      logger.log('🧭 REDIRIGIENDO A /dashboard');
+      logger.log('📍 URL destino', { destino: window.location.origin + '/dashboard' });
+      
+      window.location.href = '/dashboard';
+      
+      // Fallback después de 5 segundos
       setTimeout(() => {
-        console.log('🔹 [6] Ejecutando redirección...');
-        window.location.href = '/dashboard';  // ← CAMBIO AQUÍ
-      }, 1000);
+        if (window.location.pathname === '/signin') {
+          logger.log('⚠️ FALLBACK ACTIVADO: Redirección anterior falló');
+          logger.log('🔀 Intentando con window.location.replace');
+          window.location.replace('/dashboard');
+        }
+      }, 5000);
       
     } catch (err: any) {
-      console.error('🔴 [7] Error inesperado:', err);
+      logger.log('💥 ERROR INESPERADO', {
+        message: err.message,
+        name: err.name
+      });
       setErrorMsg(err?.message || 'Error inesperado.');
     } finally {
-      console.log('🔹 [8] Finalizando submit...');
+      logger.log('🏁 Finalizando proceso de login');
       setIsSubmitting(false);
     }
   };
 
+  const handleDownloadLogs = () => {
+    logger.downloadLogs();
+  };
+
+  const handleClearLogs = () => {
+    logger.clearLogs();
+    setErrorMsg('Logs limpiados correctamente');
+    setTimeout(() => setErrorMsg(null), 3000);
+  };
+
   const handleOAuth = async (provider: 'github' | 'google') => {
+    logger.log('🔗 Iniciando OAuth', { provider });
     setErrorMsg(null);
     setIsSubmitting(true);
     
@@ -71,9 +135,13 @@ export default function SignIn() {
         },
       });
       if (error) {
+        logger.log('❌ Error OAuth', { error: error.message });
         setErrorMsg(error.message);
+      } else {
+        logger.log('✅ OAuth iniciado correctamente');
       }
     } catch (err: any) {
+      logger.log('💥 Error inesperado OAuth', { error: err.message });
       setErrorMsg(err?.message || 'Error inesperado.');
     } finally {
       setIsSubmitting(false);
@@ -87,7 +155,26 @@ export default function SignIn() {
           <ArrowLeftIcon className="h-5 w-5" />
           <span className="sr-only">Back</span>
         </Link>
-        <div />
+        
+        {/* Botones de debug */}
+        <div className="flex gap-2">
+          <button
+            onClick={handleDownloadLogs}
+            className="flex items-center gap-2 px-3 py-2 text-sm bg-blue-500 text-white rounded-md hover:bg-blue-600"
+            title="Descargar logs de debug"
+          >
+            <Download className="h-4 w-4" />
+            Descargar Logs
+          </button>
+          <button
+            onClick={handleClearLogs}
+            className="flex items-center gap-2 px-3 py-2 text-sm bg-red-500 text-white rounded-md hover:bg-red-600"
+            title="Limpiar logs"
+          >
+            <Trash2 className="h-4 w-4" />
+            Limpiar
+          </button>
+        </div>
       </div>
 
       <div className="flex items-center justify-center flex-1">
@@ -127,11 +214,12 @@ export default function SignIn() {
                   type="password"
                   name="password"
                   placeholder="********"
+                  autoComplete="current-password"
                   required
                 />
               </div>
               <Button type="submit" className="w-full" loading={isSubmitting} disabled={isSubmitting}>
-                Sign in
+                {isSubmitting ? 'Signing in...' : 'Sign in'}
               </Button>
             </form>
 
