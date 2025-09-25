@@ -1,100 +1,142 @@
 // app/admin/page.tsx
+export const dynamic = 'force-dynamic';
 import 'server-only';
 import { redirect } from 'next/navigation';
 import { createUserClient } from '@/utils/supabase/server-user';
 import { createAdminClient } from '@/utils/supabase/server-admin';
-import AdminAuthActions from '@/components/admin/AdminAuthActions';
+import AdminAuthActions from '@/components/admin/AdminAuthActions'; // comment this import + component if you don't have it
 
 function money(cents: number) {
   return (cents / 100).toLocaleString('en-US', { style: 'currency', currency: 'USD' });
 }
 
 export default async function AdminPage() {
-  // 1) Sesión + permiso
+  // 1) Session + permission
   const userDb = createUserClient();
   const { data: { user } } = await userDb.auth.getUser();
   if (!user) redirect('/signin');
 
-  const { data: me, error: meErr } = await userDb
+  const { data: me } = await userDb
     .from('users')
     .select('role')
     .eq('id', user.id)
     .single();
 
-  if (meErr || me?.role !== 'admin') redirect('/');
+  // Accept 'admin' or 'manager' (your DB currently uses "manager")
+  const role = me?.role ?? '';
+  if (!['admin', 'manager'].includes(role)) redirect('/');
 
-  // 2) Datos admin (service role)
+  // 2) Admin data (service role)
   const adminDb = createAdminClient();
 
-  // KPI usuarios
-  const { count: usersCount } = await adminDb
-    .from('users')
-    .select('*', { head: true, count: 'exact' });
+  // KPI: total users (public.users)
+  let usersCount = 0;
+  {
+    const { count } = await adminDb
+      .from('users')
+      .select('*', { head: true, count: 'exact' });
+    usersCount = count ?? 0;
+  }
 
-  // KPI suscripciones activas
-  const { count: activeSubs } = await adminDb
-    .from('subscriptions')
-    .select('*', { head: true, count: 'exact' })
-    .eq('status', 'active');
+  // KPI: active subscriptions (won't crash if the table isn't there yet)
+  let activeSubs = 0;
+  try {
+    const { count } = await adminDb
+      .from('subscriptions')
+      .select('*', { head: true, count: 'exact' })
+      .eq('status', 'active');
+    activeSubs = count ?? 0;
+  } catch {
+    activeSubs = 0;
+  }
 
-  // KPI MRR
-  const [{ data: activeRows }, { data: priceRows }] = await Promise.all([
-    adminDb.from('subscriptions').select('user_id, price_id, quantity, status, current_period_end').eq('status','active'),
-    adminDb.from('prices').select('id, unit_amount, nickname'),
-  ]);
-  const unitByPrice = new Map((priceRows ?? []).map(p => [p.id, p.unit_amount ?? 0]));
-  const nickByPrice = new Map((priceRows ?? []).map(p => [p.id, p.nickname ?? p.id]));
-  const mrrCents = (activeRows ?? []).reduce((acc, s) => acc + (s.quantity ?? 1) * (unitByPrice.get(s.price_id!) ?? 0), 0);
+  // KPI: MRR (sum of unit_amount * quantity over active subscriptions)
+  let mrrCents = 0;
+  let unitByPrice = new Map<string, number>();
+  let nickByPrice = new Map<string, string>();
+  try {
+    const [{ data: activeRows }, { data: priceRows }] = await Promise.all([
+      adminDb.from('subscriptions').select(
+        'user_id, price_id, quantity, status, current_period_end'
+      ).eq('status','active'),
+      adminDb.from('prices').select('id, unit_amount, nickname'),
+    ]);
+    unitByPrice = new Map((priceRows ?? []).map((p: any) => [p.id, p.unit_amount ?? 0]));
+    nickByPrice = new Map((priceRows ?? []).map((p: any) => [p.id, p.nickname ?? p.id]));
+    mrrCents = (activeRows ?? []).reduce((acc: number, s: any) => {
+      const unit = unitByPrice.get(s.price_id!) ?? 0;
+      const qty = s.quantity ?? 1;
+      return acc + unit * qty;
+    }, 0);
+  } catch {
+    mrrCents = 0;
+  }
 
-  // Suscripciones (últimas 25)
-  const { data: subs } = await adminDb
-    .from('subscriptions')
-    .select('user_id, price_id, status, current_period_end, quantity')
-    .order('current_period_end', { ascending: false })
-    .limit(25);
+  // Subscriptions (latest 25)
+  let subs: Array<{
+    user_id: string;
+    price_id: string;
+    status: string;
+    current_period_end: number | null;
+    quantity: number | null;
+  }> = [];
+  try {
+    const { data } = await adminDb
+      .from('subscriptions')
+      .select('user_id, price_id, status, current_period_end, quantity')
+      .order('current_period_end', { ascending: false })
+      .limit(25);
+    subs = data ?? [];
+  } catch {
+    subs = [];
+  }
 
-  // Emails vía Admin API
-  const ids = Array.from(new Set((subs ?? []).map(s => s.user_id).filter(Boolean)));
+  // Emails via Admin API (null-safe)
+  const ids = Array.from(new Set((subs ?? []).map(s => s.user_id).filter(Boolean) as string[]));
   const emails = new Map<string, string>();
   if (ids.length) {
-    const { data: usersPage } = await adminDb.auth.admin.listUsers({ page: 1, perPage: 100 });
-    for (const u of usersPage.users) {
+    const { data } = await adminDb.auth.admin.listUsers({ page: 1, perPage: 100 });
+    const usersList = (data as any)?.users ?? [];
+    for (const u of usersList) {
       if (ids.includes(u.id)) emails.set(u.id, u.email ?? u.id);
     }
   }
 
-  // Usuarios recientes vía Admin API (+ map a role en public.users)
-  const recentUsersRes = await adminDb.auth.admin.listUsers({ page: 1, perPage: 25 });
-  const recentUsers = recentUsersRes.data?.users ?? [];
-  const idsRecent = recentUsers.map(u => u.id);
-  const { data: roleRows } = await adminDb.from('users').select('id, role').in('id', idsRecent);
-  const roleById = new Map((roleRows ?? []).map(r => [r.id, r.role ?? 'user']));
+  // Recent users via Admin API (+ role map from public.users)
+  const { data: ru } = await adminDb.auth.admin.listUsers({ page: 1, perPage: 25 });
+  const recentUsers = (ru as any)?.users ?? [];
+  const idsRecent = recentUsers.map((u: any) => u.id);
+  const { data: roleRows } = await adminDb
+    .from('users')
+    .select('id, role')
+    .in('id', idsRecent);
+  const roleById = new Map((roleRows ?? []).map((r: any) => [r.id, r.role ?? 'user']));
 
   return (
-    <main className="space-y-8">
+    <main className="space-y-8 px-4 py-8">
       <header className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-        <span className="text-sm text-neutral-500 dark:text-neutral-400">Solo lectura</span>
+        <span className="text-sm text-neutral-500 dark:text-neutral-400">Read only</span>
       </header>
 
       {/* KPIs */}
       <section className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <CardKPI title="Usuarios" value={usersCount ?? 0} />
-        <CardKPI title="Suscripciones activas" value={activeSubs ?? 0} />
+        <CardKPI title="Users" value={usersCount} />
+        <CardKPI title="Active subscriptions" value={activeSubs} />
         <CardKPI title="MRR (USD)" value={money(mrrCents)} />
       </section>
 
-      {/* Acciones de autenticación */}
+      {/* Auth actions (comment out if you don't have this component yet) */}
       <AdminAuthActions />
 
-      {/* Tablas */}
+      {/* Tables */}
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <UsersTable rows={recentUsers.map(u => ({
+        <UsersTable rows={recentUsers.map((u: any) => ({
           email: u.email ?? '—',
           role: roleById.get(u.id) ?? 'user',
-          created_at: u.created_at ?? null, // CORREGIDO: Solo usa created_at
+          created_at: u.created_at ?? null, // do not use u.createdAt
         }))} />
-        <SubsTable rows={(subs ?? []).map(s => ({
+        <SubsTable rows={(subs ?? []).map((s: any) => ({
           email: emails.get(s.user_id!) ?? s.user_id,
           plan: nickByPrice.get(s.price_id!) ?? s.price_id,
           status: s.status,
@@ -119,15 +161,15 @@ function UsersTable({ rows }: { rows: { email: string; role: string; created_at:
   return (
     <div className="rounded-2xl border border-neutral-200 bg-white/70 p-6 shadow-sm dark:border-neutral-800 dark:bg-neutral-900/60">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-base font-semibold">Usuarios recientes</h3>
+        <h3 className="text-base font-semibold">Recent users</h3>
       </div>
       <div className="overflow-x-auto">
         <table className="min-w-full text-sm">
           <thead>
             <tr className="text-left text-neutral-500 dark:text-neutral-400">
               <th className="py-2">Email</th>
-              <th className="py-2">Rol</th>
-              <th className="py-2">Creado</th>
+              <th className="py-2">Role</th>
+              <th className="py-2">Created</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-neutral-200 dark:divide-neutral-800">
@@ -161,7 +203,7 @@ function SubsTable({ rows }: { rows: { email: string; plan: string; status: stri
   return (
     <div className="rounded-2xl border border-neutral-200 bg-white/70 p-6 shadow-sm dark:border-neutral-800 dark:bg-neutral-900/60">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-base font-semibold">Suscripciones</h3>
+        <h3 className="text-base font-semibold">Subscriptions</h3>
       </div>
       <div className="overflow-x-auto">
         <table className="min-w-full text-sm">
@@ -169,9 +211,9 @@ function SubsTable({ rows }: { rows: { email: string; plan: string; status: stri
             <tr className="text-left text-neutral-500 dark:text-neutral-400">
               <th className="py-2">Email</th>
               <th className="py-2">Plan</th>
-              <th className="py-2">Estado</th>
-              <th className="py-2">Renueva</th>
-              <th className="py-2">Monto</th>
+              <th className="py-2">Status</th>
+              <th className="py-2">Renews</th>
+              <th className="py-2">Amount</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-neutral-200 dark:divide-neutral-800">
