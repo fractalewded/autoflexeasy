@@ -1,3 +1,5 @@
+
+
 'use client';
 
 import Link from 'next/link';
@@ -26,7 +28,6 @@ export default function SignIn() {
       const email = String(fd.get('email') || '').trim();
       const password = String(fd.get('password') || '');
 
-      // ✅ SOLO VERIFICACIÓN BÁSICA DE CREDENCIALES
       const { data, error } = await supabase.auth.signInWithPassword({ 
         email, 
         password 
@@ -38,9 +39,24 @@ export default function SignIn() {
         return;
       }
       
-      // ✅ REDIRECCIÓN INMEDIATA SIN VERIFICACIONES
-      console.log('✅ Login exitoso - Redirigiendo a dashboard');
-      window.location.href = '/dashboard';
+      // ✅ VERIFICACIÓN INTELIGENTE: Si llegamos aquí, la contraseña es correcta
+      console.log('✅ Login exitoso - Credenciales válidas');
+      
+      // ✅ FORZAR PERSISTENCIA MANUAL DEL TOKEN
+      if (data.session) {
+        localStorage.setItem('supabase.auth.token', JSON.stringify({
+          access_token: data.session.access_token,
+          refresh_token: data.session.refresh_token,
+          expires_at: Date.now() + (data.session.expires_in * 1000)
+        }));
+        console.log('🔐 Token guardado manualmente');
+      }
+      
+      // ✅ PEQUEÑA ESPERA PARA GARANTIZAR PERSISTENCIA
+      setTimeout(() => {
+        console.log('🚀 Redirigiendo al dashboard - Acceso concedido');
+        window.location.href = '/dashboard?auth=success&t=' + Date.now();
+      }, 500);
       
     } catch (err: any) {
       console.error('Error:', err);
@@ -152,8 +168,7 @@ export default function SignIn() {
               <button
                 onClick={() => handleOAuth('google')}
                 className="inline-flex items-center justify-center rounded-md border px-3 py-2 text-sm w-full disabled:opacity-50"
-                disabled={isSubmitting}
-              >
+                disabled={isSubmitting>
                 <Chrome className="mr-2 h-4 w-4" />
                 Sign in with Google
               </button>
