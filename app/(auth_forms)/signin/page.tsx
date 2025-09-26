@@ -1,5 +1,3 @@
-
-
 'use client';
 
 import Link from 'next/link';
@@ -168,7 +166,8 @@ export default function SignIn() {
               <button
                 onClick={() => handleOAuth('google')}
                 className="inline-flex items-center justify-center rounded-md border px-3 py-2 text-sm w-full disabled:opacity-50"
-                disabled={isSubmitting>
+                disabled={isSubmitting}  {/* ✅ CORREGIDO: cerré correctamente el tag */}
+              >
                 <Chrome className="mr-2 h-4 w-4" />
                 Sign in with Google
               </button>
