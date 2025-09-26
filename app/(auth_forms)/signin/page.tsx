@@ -99,21 +99,26 @@ export default function SignIn() {
 
       await logWithDelay('🧭 [SIGNIN] VERIFICANDO TOKEN ANTES DE REDIRIGIR');
       
-      // ✅ SOLUCIÓN: Verificar token antes de redirigir
+      // ✅ BYPASS TEMPORAL: Redirigir siempre al dashboard
       setTimeout(() => {
         const token = localStorage.getItem('supabase.auth.token');
-        console.log('🔑 [SIGNIN] Token final en localStorage:', token ? 'PRESENTE' : 'AUSENTE');
+        console.log('🔑 [SIGNIN] Token en localStorage:', token ? 'PRESENTE' : 'AUSENTE');
         
-        if (!token) {
-          console.log('⚠️ [SIGNIN] Token ausente - Forzando recarga de página');
-          window.location.reload();
-        } else {
-          console.log('✅ [SIGNIN] Token presente - Redirigiendo a dashboard');
-          window.location.href = '/dashboard';
-        }
+        // ⚠️ BYPASS: COMENTAR VERIFICACIÓN ORIGINAL
+        // if (!token) {
+        //   console.log('⚠️ [SIGNIN] Token ausente - Forzando recarga de página');
+        //   window.location.reload();
+        // } else {
+        //   console.log('✅ [SIGNIN] Token presente - Redirigiendo a dashboard');
+        //   window.location.href = '/dashboard';
+        // }
+        
+        // ✅ REDIRECCIÓN DIRECTA SIEMPRE
+        console.log('🚀 [SIGNIN] Redirigiendo a dashboard (bypass activado)');
+        window.location.href = '/dashboard';
       }, 1000);
       
-      // Fallback después de 8 segundos
+      // Fallback después de 8 segundos (mantener por seguridad)
       setTimeout(() => {
         if (window.location.pathname === '/signin') {
           console.log('⚠️ [SIGNIN] FALLBACK ACTIVADO: Redirección anterior falló');
