@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-
 import { Card, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -16,131 +15,41 @@ export default function SignIn() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  // Función con espera de 4 segundos entre mensajes
-  const logWithDelay = (message: string, data?: any, delay = 4000) => {
-    return new Promise(resolve => {
-      setTimeout(() => {
-        console.log(`[${new Date().toISOString()}] ${message}`, data || '');
-        resolve(null);
-      }, delay);
-    });
-  };
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setErrorMsg(null);
     setIsSubmitting(true);
 
-    await logWithDelay('🔐 [SIGNIN] === INICIANDO PROCESO DE LOGIN ===');
-    await logWithDelay('📝 [SIGNIN] Formulario enviado', { isSubmitting: true });
-
     try {
-      // ✅ CORRECCIÓN: Usar e.target en lugar de e.currentTarget
       const form = e.target as HTMLFormElement;
       const fd = new FormData(form);
       const email = String(fd.get('email') || '').trim();
       const password = String(fd.get('password') || '');
 
-      await logWithDelay('📧 [SIGNIN] Email obtenido', { email: email ? '***' + email.slice(-10) : 'VACÍO' });
-      await logWithDelay('🔒 [SIGNIN] Longitud de password', { length: password.length });
-      await logWithDelay('🌐 [SIGNIN] URL actual', { url: window.location.href });
-
-      await logWithDelay('🔄 [SIGNIN] Llamando a supabase.auth.signInWithPassword');
-      
-      const startTime = Date.now();
+      // ✅ SOLO VERIFICACIÓN BÁSICA DE CREDENCIALES
       const { data, error } = await supabase.auth.signInWithPassword({ 
         email, 
         password 
       });
-      const endTime = Date.now();
-      
-      await logWithDelay('⏱️ [SIGNIN] Tiempo de respuesta Supabase', { tiempo: endTime - startTime + 'ms' });
-      await logWithDelay('📨 [SIGNIN] Respuesta de Supabase', { 
-        error: error ? { message: error.message, status: error.status } : null,
-        dataPresente: !!data 
-      });
       
       if (error) {
-        await logWithDelay('❌ [SIGNIN] ERROR DE AUTENTICACIÓN', {
-          message: error.message,
-          status: error.status,
-          name: error.name
-        });
         setErrorMsg(error.message || 'Credenciales inválidas.');
+        setIsSubmitting(false);
         return;
       }
       
-      await logWithDelay('✅ [SIGNIN] LOGIN EXITOSO');
-      await logWithDelay('👤 [SIGNIN] Datos de usuario', {
-        id: data.user?.id,
-        email: data.user?.email,
-        sesionCreada: !!data.session,
-        rol: data.user?.role
-      });
-
-      // Debug de almacenamiento
-      await logWithDelay('💾 [SIGNIN] Verificando localStorage');
-      try {
-        const supabaseToken = localStorage.getItem('supabase.auth.token');
-        await logWithDelay('🔐 [SIGNIN] Token en localStorage', { tokenPresente: !!supabaseToken });
-      } catch (storageError) {
-        await logWithDelay('⚠️ [SIGNIN] Error accediendo localStorage', { error: storageError });
-      }
-
-      await logWithDelay('🔄 [SIGNIN] Verificando sesión persistida');
-      const { data: sessionCheck, error: sessionError } = await supabase.auth.getSession();
-      await logWithDelay('🔍 [SIGNIN] Sesión después de login', {
-        error: sessionError,
-        sesionPresente: !!sessionCheck.session
-      });
-
-      await logWithDelay('⏳ [SIGNIN] Esperando 2 segundos para sincronización');
-      await new Promise(resolve => setTimeout(resolve, 2000));
-
-      await logWithDelay('🧭 [SIGNIN] VERIFICANDO TOKEN ANTES DE REDIRIGIR');
-      
-      // ✅ BYPASS TEMPORAL: Redirigir siempre al dashboard
-      setTimeout(() => {
-        const token = localStorage.getItem('supabase.auth.token');
-        console.log('🔑 [SIGNIN] Token en localStorage:', token ? 'PRESENTE' : 'AUSENTE');
-        
-        // ⚠️ BYPASS: COMENTAR VERIFICACIÓN ORIGINAL
-        // if (!token) {
-        //   console.log('⚠️ [SIGNIN] Token ausente - Forzando recarga de página');
-        //   window.location.reload();
-        // } else {
-        //   console.log('✅ [SIGNIN] Token presente - Redirigiendo a dashboard');
-        //   window.location.href = '/dashboard';
-        // }
-        
-        // ✅ REDIRECCIÓN DIRECTA SIEMPRE
-        console.log('🚀 [SIGNIN] Redirigiendo a dashboard (bypass activado)');
-        window.location.href = '/dashboard';
-      }, 1000);
-      
-      // Fallback después de 8 segundos (mantener por seguridad)
-      setTimeout(() => {
-        if (window.location.pathname === '/signin') {
-          console.log('⚠️ [SIGNIN] FALLBACK ACTIVADO: Redirección anterior falló');
-          console.log('🔀 [SIGNIN] Intentando recarga completa');
-          window.location.href = window.location.origin + '?refresh=' + Date.now();
-        }
-      }, 8000);
+      // ✅ REDIRECCIÓN INMEDIATA SIN VERIFICACIONES
+      console.log('✅ Login exitoso - Redirigiendo a dashboard');
+      window.location.href = '/dashboard';
       
     } catch (err: any) {
-      await logWithDelay('💥 [SIGNIN] ERROR INESPERADO', {
-        message: err.message,
-        name: err.name
-      });
-      setErrorMsg(err?.message || 'Error inesperado.');
-    } finally {
-      await logWithDelay('🏁 [SIGNIN] Finalizando proceso de login');
+      console.error('Error:', err);
+      setErrorMsg('Error inesperado.');
       setIsSubmitting(false);
     }
   };
 
   const handleOAuth = async (provider: 'github' | 'google') => {
-    console.log('🔗 [SIGNIN] Iniciando OAuth con:', provider);
     setErrorMsg(null);
     setIsSubmitting(true);
     
@@ -152,12 +61,10 @@ export default function SignIn() {
         },
       });
       if (error) {
-        console.error('❌ [SIGNIN] Error OAuth:', error);
         setErrorMsg(error.message);
       }
     } catch (err: any) {
-      console.error('💥 [SIGNIN] Error inesperado OAuth:', err);
-      setErrorMsg(err?.message || 'Error inesperado.');
+      setErrorMsg('Error inesperado.');
     } finally {
       setIsSubmitting(false);
     }
