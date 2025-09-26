@@ -48,9 +48,10 @@ export default function SignIn() {
         console.log('🔐 Token guardado manualmente');
       }
       
+      // ✅ REDIRECCIÓN CON PARÁMETROS PARA EL MIDDLEWARE
       setTimeout(() => {
-        console.log('🚀 Redirigiendo al dashboard - Acceso concedido');
-        window.location.href = '/dashboard?auth=success&t=' + Date.now();
+        console.log('🚀 Redirigiendo al dashboard con parámetros de verificación');
+        window.location.href = '/dashboard?auth=success&from=login&t=' + Date.now();
       }, 500);
       
     } catch (err: any) {
