@@ -1,5 +1,6 @@
 'use server';
 
+
 import { createClient } from '@/utils/supabase/server';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
@@ -192,7 +193,7 @@ export async function signUp(formData: FormData) {
       error.message
     );
   } else if (data.session) {
-    redirectPath = getStatusRedirect('/', 'Success!', 'You are now signed in.');
+    redirectPath = getStatusRedirect('/dashboard', 'Success!', 'You are now signed in.');
   } else if (
     data.user &&
     data.user.identities &&
