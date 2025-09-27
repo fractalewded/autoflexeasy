@@ -1,48 +1,39 @@
-// app/auth/callback/route.ts
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-
-import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/utils/supabase/server'; // ✅ Elimina la importación de 'cookies'
-
-const ADMIN_PANEL_PATH = '/admin';
-const USER_PANEL_PATH = '/dashboard/account';
+import { createClient } from '@/utils/supabase/server';
+import { NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
+import { getErrorRedirect, getStatusRedirect } from '@/utils/helpers';
 
 export async function GET(request: NextRequest) {
-  const url = new URL(request.url);
-  const origin = url.origin;
-  const code = url.searchParams.get('code');
+  // The `/auth/callback` route is required for the server-side auth flow implemented
+  // by the `@supabase/ssr` package. It exchanges an auth code for the user's session.
+  const requestUrl = new URL(request.url);
+  const code = requestUrl.searchParams.get('code');
+  console.log('Auth/callback');
+  console.log('Code', code);
 
-  // ✅ CORRECTO: createClient() sin parámetros
-  const supabase = createClient();
-
-  // 1) Magic link / recovery: exchange code -> session
   if (code) {
+    const supabase = createClient();
+
     const { error } = await supabase.auth.exchangeCodeForSession(code);
+    console.log('error', error);
+
     if (error) {
-      console.error('[auth/callback] exchange error:', error.message);
-      return NextResponse.redirect(new URL('/signin', origin));
+      return NextResponse.redirect(
+        getErrorRedirect(
+          `${requestUrl.origin}/signin`,
+          error.name,
+          "Sorry, we weren't able to log you in. Please try again."
+        )
+      );
     }
   }
 
-  // 2) Current user (from server-side cookies)
-  const { data: { user }, error: uErr } = await supabase.auth.getUser();
-  if (uErr) console.warn('[auth/callback] getUser error:', uErr.message);
-  if (!user) return NextResponse.redirect(new URL('/signin', origin));
-
-  // 3) Role from public.users (accept admin OR manager)
-  const { data: me, error: rErr } = await supabase
-    .from('users')
-    .select('role')
-    .eq('id', user.id)
-    .single();
-  if (rErr) console.warn('[auth/callback] role query error:', rErr.message);
-
-  const role = (me as any)?.role ?? 'user';
-  const dest = (role === 'admin' || role === 'manager')
-    ? ADMIN_PANEL_PATH
-    : USER_PANEL_PATH;
-
-  // 4) Clean redirect (no status query params)
-  return NextResponse.redirect(new URL(dest, origin));
+  // URL to redirect to after sign in process completes
+  return NextResponse.redirect(
+    getStatusRedirect(
+      `${requestUrl.origin}/dashboard/account`,
+      'Success!',
+      'You are now signed in.'
+    )
+  );
 }
