@@ -3,7 +3,7 @@ import { createClient } from '@/utils/supabase/server';
 export default async function AdminPage() {
   const supabase = createClient();
 
-  // Obtener datos REALES de Supabase
+  // Obtener datos REALES de Supabase con manejo de errores
   const [
     usersResponse,
     subscriptionsResponse,
@@ -37,23 +37,23 @@ export default async function AdminPage() {
   const activeSubscriptions = activeSubsResponse.count || 0;
   
   // Calcular ingresos mensuales REALES
-  const monthlyRevenue = (subscriptionsResponse.data || []).reduce((total, sub) => {
+  const monthlyRevenue = (subscriptionsResponse.data || []).reduce((total, sub: any) => {
     if (sub.status === 'active') {
-      const price = pricesResponse.data?.find(p => p.id === sub.price_id);
+      const price = pricesResponse.data?.find((p: any) => p.id === sub.price_id);
       // Convertir de centavos a dólares
       return total + ((price?.unit_amount || 0) / 100);
     }
     return total;
   }, 0);
 
-  // Obtener usuarios recientes para mostrar en la tabla
+  // Obtener usuarios recientes para mostrar en la tabla - CON TIPOS SEGUROS
   const { data: recentUsers } = await supabase
     .from('users')
     .select('id, email, role, created_at')
     .order('created_at', { ascending: false })
     .limit(5);
 
-  // Obtener suscripciones recientes
+  // Obtener suscripciones recientes - CON TIPOS SEGUROS
   const { data: recentSubscriptions } = await supabase
     .from('subscriptions')
     .select('id, status, price_id, created')
@@ -116,7 +116,7 @@ export default async function AdminPage() {
           <div className="p-4">
             <div className="space-y-3">
               {recentUsers && recentUsers.length > 0 ? (
-                recentUsers.map((user) => (
+                recentUsers.map((user: any) => (
                   <div key={user.id} className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-600 last:border-0">
                     <div className="flex items-center space-x-3">
                       <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
@@ -157,7 +157,7 @@ export default async function AdminPage() {
           <div className="p-4">
             <div className="space-y-3">
               {recentSubscriptions && recentSubscriptions.length > 0 ? (
-                recentSubscriptions.map((subscription) => (
+                recentSubscriptions.map((subscription: any) => (
                   <div key={subscription.id} className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-600 last:border-0">
                     <div>
                       <div className="font-medium text-gray-800 dark:text-white text-sm">
