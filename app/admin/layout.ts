@@ -11,7 +11,7 @@ export default async function AdminLayout({
   // Verificación simple de admin
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
-    redirect('/admin-login'); // Redirige al login admin específico
+    redirect('/admin-login');
   }
 
   const { data: profile } = await supabase
@@ -21,7 +21,7 @@ export default async function AdminLayout({
     .single();
 
   if (!profile || (profile as any).role !== 'admin') {
-    redirect('/admin-login'); // Vuelve al login admin si no es admin
+    redirect('/admin-login');
   }
 
   return (
