@@ -3,6 +3,8 @@ import stripe from '@/lib/stripe';
 
 export async function GET() {
   try {
+    console.log('Fetching Stripe data...');
+    
     // Obtener múltiples datos de Stripe en paralelo
     const [balance, subscriptions, paymentIntents, customers] = await Promise.all([
       stripe.balance.retrieve(),
@@ -16,10 +18,12 @@ export async function GET() {
         expand: ['data.customer']
       }),
       stripe.customers.list({ 
-        limit: 100,
-        expand: ['data.subscriptions']
+        limit: 100
       })
     ]);
+
+    console.log(`Found ${customers.data.length} customers`);
+    console.log(`Found ${subscriptions.data.length} subscriptions`);
 
     // Calcular métricas
     const monthlyRecurring = subscriptions.data.reduce((total, sub) => {
@@ -29,21 +33,27 @@ export async function GET() {
     const totalRevenue = balance.available[0]?.amount / 100 || 0;
 
     // Preparar datos de usuarios
-    const users = customers.data.map(customer => ({
-      id: customer.id,
-      name: customer.name || 'Cliente Sin Nombre',
-      email: customer.email || 'Sin email',
-      created: new Date(customer.created * 1000).toLocaleDateString('es-ES'),
-      status: customer.subscriptions?.data?.length > 0 ? 'active' : 'inactive',
-      subscription: customer.subscriptions?.data?.[0]?.status || 'none'
-    }));
+    const users = customers.data.map(customer => {
+      const customerSubscriptions = subscriptions.data.filter(sub => 
+        sub.customer && sub.customer.id === customer.id
+      );
+      
+      return {
+        id: customer.id,
+        name: customer.name || 'Cliente Sin Nombre',
+        email: customer.email || 'sin-email@ejemplo.com',
+        created: new Date(customer.created * 1000).toLocaleDateString('es-ES'),
+        status: customerSubscriptions.length > 0 ? 'active' : 'inactive',
+        subscription: customerSubscriptions.length > 0 ? 'active' : 'none'
+      };
+    });
 
     // Preparar datos de suscripciones
     const subscriptionList = subscriptions.data.map(sub => ({
       id: sub.id,
       customer: {
         name: sub.customer?.name || 'Cliente Sin Nombre',
-        email: sub.customer?.email || 'Sin email'
+        email: sub.customer?.email || 'sin-email@ejemplo.com'
       },
       status: sub.status,
       amount: (sub.items.data[0]?.price.unit_amount || 0) / 100,
@@ -72,11 +82,15 @@ export async function GET() {
       recentSubscriptions: subscriptionList.slice(0, 5)
     };
 
+    console.log('Dashboard data prepared successfully');
     return NextResponse.json(dashboardData);
   } catch (error) {
     console.error('Error fetching Stripe data:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch Stripe data' },
+      { 
+        error: 'Failed to fetch Stripe data',
+        details: error.message 
+      },
       { status: 500 }
     );
   }

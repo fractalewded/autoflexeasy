@@ -92,16 +92,23 @@ export default function RobotDashboard() {
     { id: 6, name: 'Saturday' }
   ];
 
-  // Cargar datos de Stripe
+  // Cargar datos de Stripe con debugging
   useEffect(() => {
     const fetchStripeData = async () => {
       try {
         setLoading(true);
+        console.log('Making request to /api/stripe/dashboard');
         const response = await fetch('/api/stripe/dashboard');
+        
         if (!response.ok) {
-          throw new Error('Failed to fetch Stripe data');
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
+        
         const data = await response.json();
+        console.log('Stripe data received:', data);
+        console.log('Users count:', data.users?.length);
+        console.log('Sample user:', data.users?.[0]);
+        
         setStripeData(data);
       } catch (err) {
         console.error('Error loading Stripe data:', err);
@@ -143,6 +150,23 @@ export default function RobotDashboard() {
     }));
   };
 
+  // Función para cerrar sesión
+  const handleLogout = () => {
+    // Aquí va tu lógica de logout
+    // Por ejemplo, si usas NextAuth:
+    // signOut();
+    
+    // Si usas sesiones simples, redirige al login
+    if (typeof window !== 'undefined') {
+      // Limpiar localStorage/sessionStorage si es necesario
+      localStorage.removeItem('auth-token');
+      sessionStorage.removeItem('auth-token');
+      
+      // Redirigir a la página principal
+      window.location.href = '/';
+    }
+  };
+
   const getStatusVariant = () => {
     switch (status) {
       case 'active': return 'default';
@@ -178,8 +202,8 @@ export default function RobotDashboard() {
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Control Panel - AutoFlex</h1>
-            <p className="text-muted-foreground">Automated system for Amazon Flex block capture</p>
+            <h1 className="text-3xl font-bold tracking-tight">FlexEasy Admin - Panel de Control</h1>
+            <p className="text-muted-foreground">Sistema automatizado para Amazon Flex</p>
           </div>
           <div className="flex items-center gap-4">
             <Badge variant={getStatusVariant()} className="text-sm">
@@ -191,6 +215,19 @@ export default function RobotDashboard() {
                 API Error
               </Badge>
             )}
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <span>gerente_in@autoflexeasy.com</span>
+              <span className="text-xs bg-primary/10 px-2 py-1 rounded">Administrador</span>
+            </div>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={handleLogout}
+              className="flex items-center gap-2"
+            >
+              <Square className="w-4 h-4" />
+              Cerrar Sesión
+            </Button>
           </div>
         </div>
 
@@ -200,7 +237,7 @@ export default function RobotDashboard() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground">Total Revenue</p>
+                  <p className="text-sm font-medium text-muted-foreground">Ingresos Totales</p>
                   <p className="text-2xl font-bold">
                     ${stripeData?.totalRevenue?.toLocaleString() || '0'}
                   </p>
@@ -216,7 +253,7 @@ export default function RobotDashboard() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground">Active Subscriptions</p>
+                  <p className="text-sm font-medium text-muted-foreground">Suscripciones Activas</p>
                   <p className="text-2xl font-bold">
                     {stripeData?.activeSubscriptions || '0'}
                   </p>
@@ -232,7 +269,7 @@ export default function RobotDashboard() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground">Monthly Recurring</p>
+                  <p className="text-sm font-medium text-muted-foreground">MRR Mensual</p>
                   <p className="text-2xl font-bold">
                     ${stripeData?.monthlyRecurring?.toLocaleString() || '0'}
                   </p>
@@ -248,7 +285,7 @@ export default function RobotDashboard() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground">Total Customers</p>
+                  <p className="text-sm font-medium text-muted-foreground">Total Clientes</p>
                   <p className="text-2xl font-bold">
                     {stripeData?.totalCustomers || '0'}
                   </p>
@@ -362,16 +399,16 @@ export default function RobotDashboard() {
             <CardHeader>
               <CardTitle className="flex items-center">
                 <Zap className="mr-2 h-5 w-5" />
-                System Status
+                Estado del Sistema
               </CardTitle>
-              <CardDescription>Current status and basic configuration</CardDescription>
+              <CardDescription>Estado actual y configuración básica</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
                 <Label htmlFor="auto-search" className="flex flex-col space-y-1">
-                  <span>Auto Search</span>
+                  <span>Búsqueda Automática</span>
                   <span className="text-xs font-normal text-muted-foreground">
-                    Enable to automatically search for blocks
+                    Habilitar para buscar bloques automáticamente
                   </span>
                 </Label>
                 <Switch
@@ -383,9 +420,9 @@ export default function RobotDashboard() {
               
               <div className="flex items-center justify-between">
                 <Label htmlFor="notifications" className="flex flex-col space-y-1">
-                  <span>Notifications</span>
+                  <span>Notificaciones</span>
                   <span className="text-xs font-normal text-muted-foreground">
-                    Receive alerts for new blocks
+                    Recibir alertas para nuevos bloques
                   </span>
                 </Label>
                 <Switch
@@ -397,14 +434,14 @@ export default function RobotDashboard() {
               
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Battery</span>
+                  <span className="text-sm font-medium">Batería</span>
                   <span className="text-sm">100%</span>
                 </div>
                 <Progress value={100} className="h-2" />
               </div>
               
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">Blocks Captured</span>
+                <span className="text-sm font-medium">Bloques Capturados</span>
                 <span className="text-sm font-medium">0</span>
               </div>
             </CardContent>
@@ -413,8 +450,8 @@ export default function RobotDashboard() {
           {/* Controls */}
           <Card>
             <CardHeader>
-              <CardTitle>Controls</CardTitle>
-              <CardDescription>Manage system operations</CardDescription>
+              <CardTitle>Controles</CardTitle>
+              <CardDescription>Gestionar operaciones del sistema</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex flex-col sm:flex-row gap-2">
@@ -425,7 +462,7 @@ export default function RobotDashboard() {
                   disabled={!isAutoSearchEnabled}
                 >
                   <Play className="mr-2 h-4 w-4" />
-                  Start
+                  Iniciar
                 </Button>
                 
                 <Button 
@@ -435,7 +472,7 @@ export default function RobotDashboard() {
                   disabled={status !== 'active'}
                 >
                   <Pause className="mr-2 h-4 w-4" />
-                  Pause
+                  Pausar
                 </Button>
                 
                 <Button 
@@ -445,18 +482,18 @@ export default function RobotDashboard() {
                   disabled={status === 'inactive'}
                 >
                   <Square className="mr-2 h-4 w-4" />
-                  Stop
+                  Detener
                 </Button>
               </div>
               
               <div className="grid grid-cols-2 gap-2">
                 <Button variant="outline" className="h-10">
                   <Settings className="mr-2 h-4 w-4" />
-                  Settings
+                  Configuración
                 </Button>
                 <Button variant="outline" className="h-10">
                   <MapPin className="mr-2 h-4 w-4" />
-                  Stations
+                  Estaciones
                 </Button>
               </div>
             </CardContent>
@@ -467,9 +504,9 @@ export default function RobotDashboard() {
             <CardHeader>
               <CardTitle className="flex items-center">
                 <DollarSign className="mr-2 h-5 w-5" />
-                Recent Payments
+                Pagos Recientes
               </CardTitle>
-              <CardDescription>Latest transactions from Stripe</CardDescription>
+              <CardDescription>Últimas transacciones de Stripe</CardDescription>
             </CardHeader>
             <CardContent>
               {stripeData?.recentPayments && stripeData.recentPayments.length > 0 ? (
@@ -495,7 +532,7 @@ export default function RobotDashboard() {
               ) : (
                 <div className="text-center py-8 text-muted-foreground">
                   <DollarSign className="mx-auto h-8 w-8 mb-2" />
-                  <p>No recent payments</p>
+                  <p>No hay pagos recientes</p>
                 </div>
               )}
             </CardContent>
@@ -506,9 +543,9 @@ export default function RobotDashboard() {
             <CardHeader>
               <CardTitle className="flex items-center">
                 <Users className="mr-2 h-5 w-5" />
-                Recent Subscriptions
+                Suscripciones Recientes
               </CardTitle>
-              <CardDescription>Latest subscription activity</CardDescription>
+              <CardDescription>Actividad reciente de suscripciones</CardDescription>
             </CardHeader>
             <CardContent>
               {stripeData?.recentSubscriptions && stripeData.recentSubscriptions.length > 0 ? (
@@ -534,7 +571,7 @@ export default function RobotDashboard() {
               ) : (
                 <div className="text-center py-8 text-muted-foreground">
                   <Users className="mx-auto h-8 w-8 mb-2" />
-                  <p>No recent subscriptions</p>
+                  <p>No hay suscripciones recientes</p>
                 </div>
               )}
             </CardContent>
@@ -545,13 +582,13 @@ export default function RobotDashboard() {
             <CardHeader>
               <CardTitle className="flex items-center">
                 <Clock9 className="mr-2 h-5 w-5" />
-                Work Schedule
+                Horario de Trabajo
               </CardTitle>
-              <CardDescription>Configure preferred block schedules</CardDescription>
+              <CardDescription>Configurar horarios preferidos de bloques</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label>Activation Schedule</Label>
+                <Label>Horario de Activación</Label>
                 <div className="flex items-center gap-2">
                   <input
                     type="time"
@@ -559,7 +596,7 @@ export default function RobotDashboard() {
                     onChange={(e) => setSchedule({...schedule, startTime: e.target.value})}
                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
                   />
-                  <span>to</span>
+                  <span>a</span>
                   <input
                     type="time"
                     value={schedule.endTime}
@@ -570,7 +607,7 @@ export default function RobotDashboard() {
               </div>
               
               <div className="space-y-2">
-                <Label>Work Days</Label>
+                <Label>Días de Trabajo</Label>
                 <div className="flex flex-wrap gap-2">
                   {daysOfWeek.map(day => (
                     <Button
@@ -592,13 +629,13 @@ export default function RobotDashboard() {
             <CardHeader>
               <CardTitle className="flex items-center">
                 <MapPin className="mr-2 h-5 w-5" />
-                Search Preferences
+                Preferencias de Búsqueda
               </CardTitle>
-              <CardDescription>Preferred stations and block types</CardDescription>
+              <CardDescription>Estaciones preferidas y tipos de bloques</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label>Preferred Stations</Label>
+                <Label>Estaciones Preferidas</Label>
                 <div className="grid grid-cols-2 gap-2">
                   {stations.map(station => (
                     <Button
@@ -615,22 +652,22 @@ export default function RobotDashboard() {
               </div>
               
               <div className="space-y-2">
-                <Label>Block Types</Label>
+                <Label>Tipos de Bloques</Label>
                 <div className="flex flex-wrap gap-2">
                   <Button variant="outline" size="sm">
-                    Instant Delivery
+                    Entrega Instantánea
                   </Button>
                   <Button variant="outline" size="sm">
-                    Scheduled Delivery
+                    Entrega Programada
                   </Button>
                   <Button variant="outline" size="sm">
-                    Logistics
+                    Logística
                   </Button>
                 </div>
               </div>
               
               <div className="space-y-2">
-                <Label>Minimum Rate per Hour</Label>
+                <Label>Tarifa Mínima por Hora</Label>
                 <div className="flex items-center gap-2">
                   <span className="text-sm">$</span>
                   <input
@@ -652,7 +689,7 @@ export default function RobotDashboard() {
           <CardHeader>
             <CardTitle className="flex items-center">
               <Bell className="mr-2 h-5 w-5" />
-              System Notifications
+              Notificaciones del Sistema
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -663,7 +700,7 @@ export default function RobotDashboard() {
                     <AlertCircle className="h-4 w-4 text-destructive" />
                   </div>
                   <div>
-                    <p className="font-medium text-destructive">Stripe API Error</p>
+                    <p className="font-medium text-destructive">Error de API Stripe</p>
                     <p className="text-sm text-destructive/80">
                       {error}
                     </p>
