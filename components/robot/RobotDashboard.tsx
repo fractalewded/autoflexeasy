@@ -16,6 +16,26 @@ interface StripeDashboardData {
   totalCustomers: number;
   churnRate: number;
   pendingInvoices: number;
+  users: Array<{
+    id: string;
+    name: string;
+    email: string;
+    created: string;
+    status: string;
+    subscription: string;
+  }>;
+  subscriptions: Array<{
+    id: string;
+    customer: {
+      name: string;
+      email: string;
+    };
+    status: string;
+    amount: number;
+    interval: string;
+    created: string;
+    current_period_end: string;
+  }>;
   recentPayments: Array<{
     id: string;
     amount: number;
@@ -25,10 +45,15 @@ interface StripeDashboardData {
   }>;
   recentSubscriptions: Array<{
     id: string;
-    customer: string;
+    customer: {
+      name: string;
+      email: string;
+    };
     status: string;
     amount: number;
+    interval: string;
     created: string;
+    current_period_end: string;
   }>;
 }
 
@@ -236,6 +261,101 @@ export default function RobotDashboard() {
           </Card>
         </div>
 
+        {/* Users and Subscriptions Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Users List */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Users className="mr-2 h-5 w-5" />
+                Usuarios Registrados
+                <Badge variant="secondary" className="ml-2">
+                  {stripeData?.users?.length || 0}
+                </Badge>
+              </CardTitle>
+              <CardDescription>Lista de clientes registrados en Stripe</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {stripeData?.users && stripeData.users.length > 0 ? (
+                <div className="space-y-3 max-h-96 overflow-y-auto">
+                  {stripeData.users.map((user) => (
+                    <div key={user.id} className="flex items-center justify-between p-3 border rounded-lg">
+                      <div className="flex items-center space-x-3">
+                        <div className="flex-shrink-0">
+                          <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                            <Users className="h-4 w-4 text-primary" />
+                          </div>
+                        </div>
+                        <div>
+                          <p className="font-medium text-sm">{user.name}</p>
+                          <p className="text-xs text-muted-foreground">{user.email}</p>
+                          <p className="text-xs text-muted-foreground">Registrado: {user.created}</p>
+                        </div>
+                      </div>
+                      <Badge 
+                        variant={user.status === 'active' ? 'default' : 'secondary'}
+                        className="text-xs"
+                      >
+                        {user.subscription === 'active' ? 'Activo' : 'Inactivo'}
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8 text-muted-foreground">
+                  <Users className="mx-auto h-8 w-8 mb-2" />
+                  <p>No hay usuarios registrados</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Subscriptions List */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <TrendingUp className="mr-2 h-5 w-5" />
+                Suscripciones Activas
+                <Badge variant="secondary" className="ml-2">
+                  {stripeData?.activeSubscriptions || 0}
+                </Badge>
+              </CardTitle>
+              <CardDescription>Suscripciones activas en el sistema</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {stripeData?.subscriptions && stripeData.subscriptions.length > 0 ? (
+                <div className="space-y-3 max-h-96 overflow-y-auto">
+                  {stripeData.subscriptions.map((subscription) => (
+                    <div key={subscription.id} className="p-3 border rounded-lg">
+                      <div className="flex items-center justify-between mb-2">
+                        <div>
+                          <p className="font-medium text-sm">{subscription.customer.name}</p>
+                          <p className="text-xs text-muted-foreground">{subscription.customer.email}</p>
+                        </div>
+                        <Badge 
+                          variant={subscription.status === 'active' ? 'default' : 'secondary'}
+                          className="text-xs"
+                        >
+                          {subscription.status}
+                        </Badge>
+                      </div>
+                      <div className="flex justify-between items-center text-xs text-muted-foreground">
+                        <span>${subscription.amount}/{subscription.interval}</span>
+                        <span>Vence: {subscription.current_period_end}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8 text-muted-foreground">
+                  <TrendingUp className="mx-auto h-8 w-8 mb-2" />
+                  <p>No hay suscripciones activas</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* System Status */}
           <Card>
@@ -396,7 +516,7 @@ export default function RobotDashboard() {
                   {stripeData.recentSubscriptions.slice(0, 5).map((subscription) => (
                     <div key={subscription.id} className="flex items-center justify-between p-3 border rounded-lg">
                       <div>
-                        <p className="font-medium text-sm">{subscription.customer}</p>
+                        <p className="font-medium text-sm">{subscription.customer.name}</p>
                         <p className="text-xs text-muted-foreground">{subscription.created}</p>
                       </div>
                       <div className="text-right">
@@ -551,16 +671,16 @@ export default function RobotDashboard() {
                 </div>
               )}
               
-              <div className="flex items-start gap-3 p-3 bg-muted rounded-lg">
-                <div className="bg-primary/10 p-2 rounded-full">
-                  <Bell className="h-4 w-4 text-primary" />
+              <div className="flex items-start gap-3 p-3 bg-primary/10 border border-primary/20 rounded-lg">
+                <div className="bg-primary/20 p-2 rounded-full">
+                  <TrendingUp className="h-4 w-4 text-primary" />
                 </div>
                 <div>
-                  <p className="font-medium">System configured successfully</p>
+                  <p className="font-medium">Resumen de Stripe</p>
                   <p className="text-sm text-muted-foreground">
                     {stripeData ? 
-                      `Connected to Stripe with ${stripeData.activeSubscriptions} active subscriptions` : 
-                      'Your system is ready to start searching for blocks. Enable auto search to begin.'
+                      `${stripeData.totalCustomers} usuarios, ${stripeData.activeSubscriptions} suscripciones activas, $${stripeData.totalRevenue} ingresos totales` : 
+                      'Conectando con Stripe...'
                     }
                   </p>
                 </div>
