@@ -343,7 +343,3 @@ export default function AdminPage() {
             </div>
           </CardContent>
         </Card>
-      </div>
-    </div>
-  );
-}
