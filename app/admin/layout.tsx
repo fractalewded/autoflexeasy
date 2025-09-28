@@ -25,8 +25,8 @@ export default async function AdminLayout({
 
   return (
     <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Sidebar Admin Mejorado */}
-      <aside className="w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col">
+      {/* Sidebar - Oculto en móviles, visible en desktop */}
+      <aside className="hidden lg:flex w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex-col">
         <div className="p-4 border-b border-gray-200 dark:border-gray-700">
           <h2 className="text-xl font-bold text-gray-800 dark:text-white">FlexEasy Admin</h2>
           <p className="text-sm text-gray-500 dark:text-gray-400">Panel de Control</p>
@@ -75,10 +75,19 @@ export default async function AdminLayout({
 
       {/* Contenido principal */}
       <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Header móvil */}
         <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4">
           <div className="flex justify-between items-center">
-            <h1 className="text-lg font-semibold text-gray-800 dark:text-white">Panel Administrativo</h1>
-            <div className="text-sm text-gray-500 dark:text-gray-400">
+            <div className="flex items-center space-x-3">
+              {/* Botón menú móvil */}
+              <button className="lg:hidden p-2 rounded-md text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              </button>
+              <h1 className="text-lg font-semibold text-gray-800 dark:text-white">Panel Administrativo</h1>
+            </div>
+            <div className="hidden sm:block text-sm text-gray-500 dark:text-gray-400">
               {new Date().toLocaleDateString('es-ES', { 
                 weekday: 'long', 
                 year: 'numeric', 
@@ -88,7 +97,8 @@ export default async function AdminLayout({
             </div>
           </div>
         </header>
-        <div className="flex-1 overflow-y-auto p-6">
+        
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6">
           {children}
         </div>
       </div>
