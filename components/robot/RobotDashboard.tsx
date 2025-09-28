@@ -7,7 +7,30 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Play, Pause, Square, Battery, Clock, Package, MapPin, Bell, Settings, Calendar, Clock9, Zap } from 'lucide-react';
+import { Play, Pause, Square, Battery, Clock, Package, MapPin, Bell, Settings, Calendar, Clock9, Zap, DollarSign, Users, TrendingUp, AlertCircle } from 'lucide-react';
+
+interface StripeDashboardData {
+  totalRevenue: number;
+  activeSubscriptions: number;
+  monthlyRecurring: number;
+  totalCustomers: number;
+  churnRate: number;
+  pendingInvoices: number;
+  recentPayments: Array<{
+    id: string;
+    amount: number;
+    status: string;
+    customer: string;
+    created: string;
+  }>;
+  recentSubscriptions: Array<{
+    id: string;
+    customer: string;
+    status: string;
+    amount: number;
+    created: string;
+  }>;
+}
 
 export default function RobotDashboard() {
   const [status, setStatus] = useState('inactive');
@@ -20,6 +43,11 @@ export default function RobotDashboard() {
     endTime: '17:00',
     days: [1, 2, 3, 4, 5] // Monday to Friday
   });
+
+  // Estados para datos de Stripe
+  const [stripeData, setStripeData] = useState<StripeDashboardData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const stations = [
     { id: 'station1', name: 'Downtown Station' },
@@ -38,6 +66,28 @@ export default function RobotDashboard() {
     { id: 5, name: 'Friday' },
     { id: 6, name: 'Saturday' }
   ];
+
+  // Cargar datos de Stripe
+  useEffect(() => {
+    const fetchStripeData = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('/api/stripe/dashboard');
+        if (!response.ok) {
+          throw new Error('Failed to fetch Stripe data');
+        }
+        const data = await response.json();
+        setStripeData(data);
+      } catch (err) {
+        console.error('Error loading Stripe data:', err);
+        setError(err instanceof Error ? err.message : 'Unknown error occurred');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStripeData();
+  }, []);
 
   const handleStart = () => {
     setStatus('active');
@@ -86,18 +136,104 @@ export default function RobotDashboard() {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen p-6 bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading dashboard data...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen p-6 bg-background">
-      <div className="max-w-6xl mx-auto space-y-6">
+      <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
             <h1 className="text-3xl font-bold tracking-tight">Control Panel - AutoFlex</h1>
             <p className="text-muted-foreground">Automated system for Amazon Flex block capture</p>
           </div>
-          <Badge variant={getStatusVariant()} className="text-sm">
-            {getStatusText()}
-          </Badge>
+          <div className="flex items-center gap-4">
+            <Badge variant={getStatusVariant()} className="text-sm">
+              {getStatusText()}
+            </Badge>
+            {error && (
+              <Badge variant="destructive" className="text-sm">
+                <AlertCircle className="w-3 h-3 mr-1" />
+                API Error
+              </Badge>
+            )}
+          </div>
+        </div>
+
+        {/* Stripe Metrics Section */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Total Revenue</p>
+                  <p className="text-2xl font-bold">
+                    ${stripeData?.totalRevenue?.toLocaleString() || '0'}
+                  </p>
+                </div>
+                <div className="p-2 bg-green-100 rounded-full">
+                  <DollarSign className="h-6 w-6 text-green-600" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Active Subscriptions</p>
+                  <p className="text-2xl font-bold">
+                    {stripeData?.activeSubscriptions || '0'}
+                  </p>
+                </div>
+                <div className="p-2 bg-blue-100 rounded-full">
+                  <Users className="h-6 w-6 text-blue-600" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Monthly Recurring</p>
+                  <p className="text-2xl font-bold">
+                    ${stripeData?.monthlyRecurring?.toLocaleString() || '0'}
+                  </p>
+                </div>
+                <div className="p-2 bg-purple-100 rounded-full">
+                  <TrendingUp className="h-6 w-6 text-purple-600" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Total Customers</p>
+                  <p className="text-2xl font-bold">
+                    {stripeData?.totalCustomers || '0'}
+                  </p>
+                </div>
+                <div className="p-2 bg-orange-100 rounded-full">
+                  <Users className="h-6 w-6 text-orange-600" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -203,6 +339,84 @@ export default function RobotDashboard() {
                   Stations
                 </Button>
               </div>
+            </CardContent>
+          </Card>
+
+          {/* Recent Payments */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <DollarSign className="mr-2 h-5 w-5" />
+                Recent Payments
+              </CardTitle>
+              <CardDescription>Latest transactions from Stripe</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {stripeData?.recentPayments && stripeData.recentPayments.length > 0 ? (
+                <div className="space-y-3">
+                  {stripeData.recentPayments.slice(0, 5).map((payment) => (
+                    <div key={payment.id} className="flex items-center justify-between p-3 border rounded-lg">
+                      <div>
+                        <p className="font-medium text-sm">{payment.customer}</p>
+                        <p className="text-xs text-muted-foreground">{payment.created}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-bold">${payment.amount}</p>
+                        <Badge 
+                          variant={payment.status === 'succeeded' ? 'default' : 'secondary'}
+                          className="text-xs"
+                        >
+                          {payment.status}
+                        </Badge>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8 text-muted-foreground">
+                  <DollarSign className="mx-auto h-8 w-8 mb-2" />
+                  <p>No recent payments</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Recent Subscriptions */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Users className="mr-2 h-5 w-5" />
+                Recent Subscriptions
+              </CardTitle>
+              <CardDescription>Latest subscription activity</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {stripeData?.recentSubscriptions && stripeData.recentSubscriptions.length > 0 ? (
+                <div className="space-y-3">
+                  {stripeData.recentSubscriptions.slice(0, 5).map((subscription) => (
+                    <div key={subscription.id} className="flex items-center justify-between p-3 border rounded-lg">
+                      <div>
+                        <p className="font-medium text-sm">{subscription.customer}</p>
+                        <p className="text-xs text-muted-foreground">{subscription.created}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-bold">${subscription.amount}</p>
+                        <Badge 
+                          variant={subscription.status === 'active' ? 'default' : 'secondary'}
+                          className="text-xs"
+                        >
+                          {subscription.status}
+                        </Badge>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8 text-muted-foreground">
+                  <Users className="mx-auto h-8 w-8 mb-2" />
+                  <p>No recent subscriptions</p>
+                </div>
+              )}
             </CardContent>
           </Card>
 
@@ -313,30 +527,6 @@ export default function RobotDashboard() {
           </Card>
         </div>
         
-        {/* Recent Activity */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Calendar className="mr-2 h-5 w-5" />
-              Recent Activity
-            </CardTitle>
-            <CardDescription>Block capture history</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="text-center py-8">
-              <Package className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-              <h3 className="text-lg font-medium mb-2">No recent activity</h3>
-              <p className="text-muted-foreground">
-                Once you start capturing blocks, they will appear here.
-              </p>
-              <Button className="mt-4" onClick={handleStart} disabled={!isAutoSearchEnabled}>
-                <Play className="mr-2 h-4 w-4" />
-                Start Search
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-        
         {/* System Notifications */}
         <Card>
           <CardHeader>
@@ -346,15 +536,34 @@ export default function RobotDashboard() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex items-start gap-3 p-3 bg-muted rounded-lg">
-              <div className="bg-primary/10 p-2 rounded-full">
-                <Bell className="h-4 w-4 text-primary" />
-              </div>
-              <div>
-                <p className="font-medium">System configured successfully</p>
-                <p className="text-sm text-muted-foreground">
-                  Your system is ready to start searching for blocks. Enable auto search to begin.
-                </p>
+            <div className="space-y-3">
+              {error && (
+                <div className="flex items-start gap-3 p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
+                  <div className="bg-destructive/20 p-2 rounded-full">
+                    <AlertCircle className="h-4 w-4 text-destructive" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-destructive">Stripe API Error</p>
+                    <p className="text-sm text-destructive/80">
+                      {error}
+                    </p>
+                  </div>
+                </div>
+              )}
+              
+              <div className="flex items-start gap-3 p-3 bg-muted rounded-lg">
+                <div className="bg-primary/10 p-2 rounded-full">
+                  <Bell className="h-4 w-4 text-primary" />
+                </div>
+                <div>
+                  <p className="font-medium">System configured successfully</p>
+                  <p className="text-sm text-muted-foreground">
+                    {stripeData ? 
+                      `Connected to Stripe with ${stripeData.activeSubscriptions} active subscriptions` : 
+                      'Your system is ready to start searching for blocks. Enable auto search to begin.'
+                    }
+                  </p>
+                </div>
               </div>
             </div>
           </CardContent>
