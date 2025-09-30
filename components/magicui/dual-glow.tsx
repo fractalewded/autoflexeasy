@@ -3,48 +3,32 @@
 import { useTheme } from 'next-themes';
 import { cn } from '@/lib/utils';
 
-interface DualGlowProps { className?: string }
-
-export default function DualGlow({ className }: DualGlowProps) {
+export default function CubeBg({ className = '' }: { className?: string }) {
   const { theme, systemTheme } = useTheme();
   const mode = theme === 'system' ? systemTheme : theme;
   const isDark = mode === 'dark';
 
+  // Colores base para claro/oscuro
+  const c1 = isDark ? '#0b0b0b' : '#f6f6f6';
+  const c2 = isDark ? '#121212' : '#eaeaea';
+  const c3 = isDark ? '#1a1a1a' : '#dcdcdc';
+
+  const size = 40; // tamaño del patrón
+
   return (
-    <div className={cn('pointer-events-none absolute inset-0 -z-10', className)}>
-      <div
-        className={cn(
-          'absolute -top-1/3 left-1/2 -translate-x-1/2',
-          'h-[80vh] w-[80vh] rounded-full blur-[60px]',
-          isDark ? 'opacity-70' : 'opacity-50'
-        )}
-        style={{
-          background: isDark
-            ? 'radial-gradient(ellipse at center, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.0) 60%)'
-            : 'radial-gradient(ellipse at center, rgba(0,0,0,0.12) 0%, rgba(0,0,0,0.0) 60%)',
-        }}
-      />
-      <div
-        className={cn(
-          'absolute -bottom-1/4 -right-1/6',
-          'h-[60vh] w-[60vh] rounded-full blur-[70px]',
-          isDark ? 'opacity-40' : 'opacity-30'
-        )}
-        style={{
-          background: isDark
-            ? 'radial-gradient(ellipse at center, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.0) 60%)'
-            : 'radial-gradient(ellipse at center, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.0) 60%)',
-        }}
-      />
-      <div
-        className={cn('absolute inset-0 mix-blend-overlay', isDark ? 'opacity-[0.06]' : 'opacity-[0.05]')}
-        style={{
-          backgroundImage:
-            'linear-gradient(to right, currentColor 1px, transparent 1px), linear-gradient(to bottom, currentColor 1px, transparent 1px)',
-          backgroundSize: '36px 36px',
-          color: isDark ? '#FFFFFF' : '#000000',
-        }}
-      />
-    </div>
+    <div
+      className={cn('pointer-events-none absolute inset-0 -z-10', className)}
+      style={{
+        backgroundColor: c1,
+        // patrón de cubos (3 losas en 60°)
+        backgroundImage: `
+          linear-gradient(30deg, ${c2} 12%, transparent 12.5%, transparent 87%, ${c2} 87.5%, ${c2}),
+          linear-gradient(150deg, ${c2} 12%, transparent 12.5%, transparent 87%, ${c2} 87.5%, ${c2}),
+          linear-gradient(90deg, ${c3} 12%, transparent 12.5%, transparent 87%, ${c3} 87.5%, ${c3})
+        `,
+        backgroundSize: `${size}px ${size}px`,
+        backgroundPosition: '0 0, 0 0, 0 0',
+      }}
+    />
   );
 }
