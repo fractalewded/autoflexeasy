@@ -5,8 +5,8 @@
  import { cn } from '@/lib/utils';
  import { buttonVariants } from '@/components/ui/button';
  import Particles from '@/components/magicui/particles';
--import Ripple from '@/components/magicui/ripple';
-+import DualGlow from '@/components/magicui/dual-glow';
+ import Ripple from '@/components/magicui/ripple';
+ import DualGlow from '@/components/magicui/dual-glow';
  import { GitHubLogoIcon } from '@radix-ui/react-icons';
  import { useTheme } from 'next-themes';
 
@@ -16,22 +16,22 @@
    return (
      <section className="relative w-full overflow-hidden">
        <div className="absolute inset-0 z-0">
--        <Particles
--          className="absolute inset-0"
--          quantity={300}
--          ease={80}
--          color={theme === 'dark' ? '#FFFFFF' : '#000000'}
--          refresh
--        />
--        <Ripple />
-+        <Particles
-+          className="absolute inset-0"
-+          quantity={220}               // un poco menos para look más limpio
-+          ease={80}
-+          color={theme === 'dark' ? '#FFFFFF' : '#000000'}
-+          refresh
-+        />
-+        <DualGlow />
+        <Particles
+         className="absolute inset-0"
+          quantity={300}
+          ease={80}
+          color={theme === 'dark' ? '#FFFFFF' : '#000000'}
+          refresh
+        />
+        <Ripple />
+        <Particles
+          className="absolute inset-0"
+          quantity={220}               // un poco menos para look más limpio
+          ease={80}
+          color={theme === 'dark' ? '#FFFFFF' : '#000000'}
+          refresh
+        />
+        <DualGlow />
        </div>
 
        <div className="container mx-auto px-4 py-12 md:py-16 lg:py-32">
