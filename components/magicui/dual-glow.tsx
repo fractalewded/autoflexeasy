@@ -1,33 +1,25 @@
 'use client';
 
-import { useTheme } from 'next-themes';
 import { cn } from '@/lib/utils';
 
-export default function CubeBg({ className = '' }: { className?: string }) {
-  const { theme, systemTheme } = useTheme();
-  const mode = theme === 'system' ? systemTheme : theme;
-  const isDark = mode === 'dark';
-
-  // Colores base para claro/oscuro
-  const c1 = isDark ? '#0b0b0b' : '#f6f6f6';
-  const c2 = isDark ? '#121212' : '#eaeaea';
-  const c3 = isDark ? '#1a1a1a' : '#dcdcdc';
-
-  const size = 40; // tamaño del patrón
-
+export default function CubesBg({ className = '' }: { className?: string }) {
   return (
     <div
       className={cn('pointer-events-none absolute inset-0 -z-10', className)}
       style={{
-        backgroundColor: c1,
-        // patrón de cubos (3 losas en 60°)
+        // mismo color base y mismas 6 capas de linear-gradient
+        backgroundColor: '#0a0a0a',
         backgroundImage: `
-          linear-gradient(30deg, ${c2} 12%, transparent 12.5%, transparent 87%, ${c2} 87.5%, ${c2}),
-          linear-gradient(150deg, ${c2} 12%, transparent 12.5%, transparent 87%, ${c2} 87.5%, ${c2}),
-          linear-gradient(90deg, ${c3} 12%, transparent 12.5%, transparent 87%, ${c3} 87.5%, ${c3})
+          linear-gradient(30deg, #1a1a1a 12%, transparent 12.5%, transparent 87%, #1a1a1a 87.5%, #1a1a1a),
+          linear-gradient(150deg, #1a1a1a 12%, transparent 12.5%, transparent 87%, #1a1a1a 87.5%, #1a1a1a),
+          linear-gradient(30deg, #1a1a1a 12%, transparent 12.5%, transparent 87%, #1a1a1a 87.5%, #1a1a1a),
+          linear-gradient(150deg, #1a1a1a 12%, transparent 12.5%, transparent 87%, #1a1a1a 87.5%, #1a1a1a),
+          linear-gradient(60deg, #1a1a1a77 25%, transparent 25.5%, transparent 75%, #1a1a1a77 75%, #1a1a1a77),
+          linear-gradient(60deg, #1a1a1a77 25%, transparent 25.5%, transparent 75%, #1a1a1a77 75%, #1a1a1a77)
         `,
-        backgroundSize: `${size}px ${size}px`,
-        backgroundPosition: '0 0, 0 0, 0 0',
+        // tamaños y posiciones EXACTOS del HTML
+        backgroundSize: '80px 140px',
+        backgroundPosition: '0 0, 0 0, 40px 70px, 40px 70px, 0 0, 40px 70px',
       }}
     />
   );
