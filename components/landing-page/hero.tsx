@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { buttonVariants } from '@/components/ui/button';
 import { GitHubLogoIcon } from '@radix-ui/react-icons';
-import CubesBg from '@/components/magicui/cubes-bg';
+import CubesBg from '@/components/magicui/dual-glow';
 
 export default function HeroSection() {
   return (
